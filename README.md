@@ -249,7 +249,7 @@ This project is developed for educational and academic purposes.
 
 ## 👩‍💻 Developer
 
-**Srushti Dumbhare**
+**Swaraj Patil**
 
 Java Full Stack Developer
 
