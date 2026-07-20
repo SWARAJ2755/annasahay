@@ -1,0 +1,2568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AnnaSahay – शाळा अन्न व जेवण नोंदणी प्रणाली</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap');
+
+/* ===== CSS VARIABLES ===== */
+:root {
+  --green-900: #0d3320;
+  --green-800: #1a4a2e;
+  --green-700: #1f5c38;
+  --green-600: #2d6a4f;
+  --green-500: #3a7d5c;
+  --green-400: #52996e;
+  --green-300: #74b88a;
+  --green-200: #a8d5b5;
+  --green-100: #d4ead9;
+  --green-50:  #eef7f0;
+  --orange-700: #b85c1a;
+  --orange-600: #c96820;
+  --orange-500: #e07b39;
+  --orange-400: #f0924f;
+  --orange-100: #fde8d4;
+  --orange-50:  #fff4ec;
+  --brown-800: #4a2410;
+  --brown-700: #6b3a2a;
+  --brown-600: #8b4a35;
+  --brown-400: #a0664e;
+  --brown-100: #f0ddd4;
+  --gold:       #c9a84c;
+  --gold-light: #f5e4a8;
+  --cream:      #faf6ee;
+  --white:      #ffffff;
+  --gray-50:    #f8f9fa;
+  --gray-100:   #f0f2f4;
+  --gray-200:   #e3e6ea;
+  --gray-300:   #ced4da;
+  --gray-400:   #b8bfc8;
+  --gray-500:   #8d97a5;
+  --gray-600:   #636f7c;
+  --gray-700:   #495057;
+  --gray-800:   #343a40;
+  --gray-900:   #212529;
+  --red-600:    #c0392b;
+  --red-500:    #dc3545;
+  --red-100:    #fce8e6;
+  --yellow-500: #f0ac00;
+  --yellow-100: #fff8e1;
+  --sidebar-w:  250px;
+  --header-h:   64px;
+  --radius-sm:  4px;
+  --radius:     8px;
+  --radius-lg:  12px;
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.08);
+  --shadow:     0 2px 8px rgba(0,0,0,0.10);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.12);
+  --border:     1px solid var(--gray-200);
+  --font-body:  'Baloo 2', 'Noto Sans Devanagari', sans-serif;
+}
+
+/* ===== RESET ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--cream);color:var(--gray-800);line-height:1.55}
+a{color:var(--green-600);text-decoration:none}
+button{cursor:pointer;font-family:var(--font-body)}
+input,select,textarea{font-family:var(--font-body)}
+ul{list-style:none}
+table{border-collapse:collapse;width:100%}
+img{max-width:100%;display:block}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--gray-100)}
+::-webkit-scrollbar-thumb{background:var(--green-400);border-radius:3px}
+
+/* ===========================
+   AUTHENTICATION
+   =========================== */
+#auth-wrapper{
+  min-height:100vh;
+  background:linear-gradient(160deg, var(--green-800) 0%, var(--green-600) 45%, var(--orange-700) 100%);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  position:relative;overflow:hidden;
+}
+#auth-wrapper::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.auth-card{
+  background:var(--white);border-radius:var(--radius-lg);
+  box-shadow:0 12px 48px rgba(0,0,0,0.3);
+  width:100%;max-width:460px;overflow:hidden;position:relative;
+}
+.auth-top{
+  background:linear-gradient(135deg, var(--green-800), var(--green-600));
+  padding:28px 28px 22px;text-align:center;color:var(--white);
+}
+.auth-top .emblem{font-size:3rem;line-height:1;margin-bottom:8px}
+.auth-top h1{font-size:1.6rem;font-weight:800;letter-spacing:0.5px}
+.auth-top .subtitle{font-size:0.8rem;opacity:0.82;margin-top:3px}
+.auth-ribbon{
+  background:var(--orange-500);color:var(--white);
+  text-align:center;font-size:0.72rem;font-weight:700;
+  padding:5px;letter-spacing:1.2px;text-transform:uppercase;
+}
+.auth-body{padding:26px 28px}
+.auth-body h2{font-size:1.05rem;font-weight:700;color:var(--green-800);margin-bottom:18px;
+  padding-bottom:10px;border-bottom:2px solid var(--green-100)}
+
+.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.role-btn{
+  padding:10px 5px;border:2px solid var(--gray-200);border-radius:var(--radius);
+  background:var(--white);text-align:center;font-size:0.74rem;font-weight:600;
+  cursor:pointer;transition:all 0.18s;color:var(--gray-600);
+}
+.role-btn:hover{border-color:var(--green-400);color:var(--green-700)}
+.role-btn.active{border-color:var(--green-600);background:var(--green-50);color:var(--green-800);font-weight:700}
+.role-btn .ri{font-size:1.4rem;display:block;margin-bottom:3px}
+
+.fgrp{margin-bottom:15px}
+.fgrp label{display:block;font-size:0.77rem;font-weight:700;color:var(--gray-600);
+  margin-bottom:5px;text-transform:uppercase;letter-spacing:0.4px}
+.fgrp input,.fgrp select,.fgrp textarea{
+  width:100%;padding:10px 13px;border:var(--border);border-radius:var(--radius);
+  font-size:0.92rem;transition:border-color 0.18s,box-shadow 0.18s;background:var(--white);
+}
+.fgrp input:focus,.fgrp select:focus,.fgrp textarea:focus{
+  outline:none;border-color:var(--green-500);
+  box-shadow:0 0 0 3px rgba(52,125,90,0.14);
+}
+.fgrp input.err-field{border-color:var(--red-500)}
+.fgrp .emsg{color:var(--red-500);font-size:0.74rem;margin-top:4px;display:none}
+.fgrp .emsg.show{display:block}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:10px 20px;border-radius:var(--radius);font-size:0.88rem;font-weight:700;
+  border:none;transition:background 0.18s,transform 0.1s;cursor:pointer;font-family:var(--font-body)}
+.btn:active{transform:scale(0.98)}
+.btn-green{background:var(--green-600);color:var(--white)}
+.btn-green:hover{background:var(--green-700)}
+.btn-orange{background:var(--orange-500);color:var(--white)}
+.btn-orange:hover{background:var(--orange-600)}
+.btn-outline{background:transparent;border:2px solid var(--green-600);color:var(--green-700)}
+.btn-outline:hover{background:var(--green-50)}
+.btn-red{background:var(--red-500);color:var(--white)}
+.btn-red:hover{background:var(--red-600)}
+.btn-gray{background:var(--gray-200);color:var(--gray-700)}
+.btn-gray:hover{background:var(--gray-300)}
+.btn-sm{padding:6px 14px;font-size:0.8rem}
+.btn-lg{padding:13px 26px;font-size:0.95rem}
+.btn-full{width:100%}
+.auth-footer{text-align:center;margin-top:14px;font-size:0.83rem;color:var(--gray-500)}
+.auth-footer a{color:var(--orange-500);font-weight:700}
+
+/* ===========================
+   APP SHELL
+   =========================== */
+#app{display:none;min-height:100vh}
+#app.show{display:flex}
+
+/* SIDEBAR */
+#sidebar{
+  width:var(--sidebar-w);background:var(--green-800);color:var(--white);
+  display:flex;flex-direction:column;position:fixed;top:0;left:0;
+  height:100vh;z-index:300;transition:transform 0.24s ease;overflow-y:auto;
+}
+.sb-brand{
+  padding:18px 16px 16px;
+  background:rgba(0,0,0,0.25);border-bottom:1px solid rgba(255,255,255,0.08);
+  display:flex;align-items:center;gap:11px;
+}
+.sb-brand-icon{font-size:2rem;line-height:1}
+.sb-brand-text h2{font-size:1.05rem;font-weight:800;letter-spacing:0.3px}
+.sb-brand-text p{font-size:0.68rem;opacity:0.65;margin-top:1px}
+
+.sb-sec{padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06)}
+.sb-sec-label{
+  font-size:0.62rem;text-transform:uppercase;letter-spacing:1.8px;
+  color:rgba(255,255,255,0.38);padding:0 16px 5px;font-weight:700;
+}
+.nav-link{
+  display:flex;align-items:center;gap:10px;padding:10px 16px;
+  color:rgba(255,255,255,0.76);font-size:0.875rem;font-weight:500;cursor:pointer;
+  transition:background 0.15s,color 0.15s;border-left:3px solid transparent;
+  user-select:none;
+}
+.nav-link:hover{background:rgba(255,255,255,0.08);color:var(--white)}
+.nav-link.active{background:rgba(255,255,255,0.14);color:var(--white);border-left-color:var(--orange-500)}
+.nav-link .ni{font-size:1.05rem;width:20px;text-align:center;flex-shrink:0}
+.nav-link .nbadge{
+  margin-left:auto;background:var(--red-500);color:var(--white);
+  font-size:0.62rem;padding:1px 6px;border-radius:10px;font-weight:700;
+}
+
+#sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:299}
+
+/* HEADER */
+#header{
+  position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--header-h);
+  background:var(--white);border-bottom:2px solid var(--green-100);
+  display:flex;align-items:center;padding:0 20px;gap:12px;
+  z-index:200;box-shadow:var(--shadow-sm);
+}
+.hdr-toggle{display:none;background:none;border:none;font-size:1.4rem;color:var(--green-700);padding:4px}
+.hdr-school{flex:1;min-width:0}
+.hdr-school h3{font-size:0.95rem;font-weight:800;color:var(--green-800);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-school p{font-size:0.7rem;color:var(--gray-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.lang-bar{display:flex;border:var(--border);border-radius:var(--radius);overflow:hidden}
+.lang-bar button{
+  padding:5px 10px;border:none;background:var(--white);color:var(--gray-600);
+  font-size:0.74rem;font-weight:700;cursor:pointer;font-family:var(--font-body);
+  transition:background 0.15s;
+}
+.lang-bar button.active{background:var(--green-600);color:var(--white)}
+.bell-btn{background:none;border:none;font-size:1.15rem;position:relative;cursor:pointer;padding:4px}
+.bell-dot{position:absolute;top:2px;right:2px;width:8px;height:8px;
+  background:var(--red-500);border-radius:50%;border:2px solid var(--white)}
+.user-chip{
+  display:flex;align-items:center;gap:8px;background:var(--green-50);
+  border:var(--border);border-radius:20px;padding:4px 13px 4px 4px;cursor:pointer;
+}
+.user-av{width:30px;height:30px;border-radius:50%;background:var(--green-600);
+  color:var(--white);display:flex;align-items:center;justify-content:center;
+  font-size:0.82rem;font-weight:800;flex-shrink:0}
+.user-nm{font-size:0.78rem;font-weight:700;color:var(--green-800)}
+
+/* CONTENT */
+#content{
+  margin-left:var(--sidebar-w);margin-top:var(--header-h);
+  padding:24px;min-height:calc(100vh - var(--header-h));
+}
+.pg{display:none}
+.pg.active{display:block}
+.pg-head{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:22px;padding-bottom:14px;border-bottom:2px solid var(--green-100);
+  gap:12px;flex-wrap:wrap;
+}
+.pg-head-left{}
+.pg-head h2{font-size:1.3rem;font-weight:800;color:var(--green-800);line-height:1.2}
+.pg-head p{font-size:0.78rem;color:var(--gray-500);margin-top:3px}
+.breadcrumb{font-size:0.72rem;color:var(--gray-400);margin-bottom:4px}
+.breadcrumb span{color:var(--green-500)}
+.pg-head-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
+
+/* ===========================
+   REUSABLE COMPONENTS
+   =========================== */
+.card{background:var(--white);border:var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow-sm);overflow:hidden}
+.card-head{padding:12px 16px;background:var(--gray-50);border-bottom:var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-head h3{font-size:0.9rem;font-weight:800;color:var(--green-800)}
+.card-head p{font-size:0.74rem;color:var(--gray-500);margin-top:2px}
+.card-body{padding:16px}
+
+/* STAT CARDS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:20px}
+.sc{background:var(--white);border:var(--border);border-radius:var(--radius);
+  padding:16px;box-shadow:var(--shadow-sm);border-top:4px solid var(--green-500);position:relative;overflow:hidden}
+.sc.orange{border-top-color:var(--orange-500)}
+.sc.brown{border-top-color:var(--brown-700)}
+.sc.red{border-top-color:var(--red-500)}
+.sc.gold{border-top-color:var(--gold)}
+.sc-bg-icon{position:absolute;right:12px;top:12px;font-size:2rem;opacity:0.1;line-height:1}
+.sc-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.6px;
+  color:var(--gray-400);font-weight:700;margin-bottom:4px}
+.sc-val{font-size:1.85rem;font-weight:800;color:var(--green-800);line-height:1}
+.sc.orange .sc-val{color:var(--brown-700)}
+.sc.red .sc-val{color:var(--red-500)}
+.sc.gold .sc-val{color:var(--brown-700)}
+.sc-sub{font-size:0.75rem;color:var(--gray-500);margin-top:5px}
+
+.pill{display:inline-block;font-size:0.68rem;padding:2px 8px;border-radius:10px;font-weight:700}
+.pill-ok{background:var(--green-100);color:var(--green-800)}
+.pill-warn{background:var(--yellow-100);color:#7a5800}
+.pill-low{background:var(--red-100);color:var(--red-600)}
+.pill-info{background:var(--green-50);color:var(--green-700)}
+
+/* TABLES */
+.tbl-wrap{overflow-x:auto}
+.tbl-wrap table{min-width:580px}
+table th{background:var(--green-800);color:var(--white);padding:9px 12px;
+  font-size:0.78rem;font-weight:700;white-space:nowrap;text-align:left}
+table td{padding:8px 12px;border-bottom:var(--border);font-size:0.82rem;vertical-align:middle}
+table tr:last-child td{border-bottom:none}
+table tr:nth-child(even) td{background:var(--gray-50)}
+table tfoot td{background:var(--green-50)!important;font-weight:700;font-size:0.84rem;border-top:2px solid var(--green-200)}
+.st-ok{color:var(--green-700);font-weight:700}
+.st-warn{color:var(--yellow-500);font-weight:700}
+.st-low{color:var(--red-500);font-weight:700}
+
+/* CHARTS */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.chart-box{background:var(--white);border:var(--border);border-radius:var(--radius);
+  padding:16px;box-shadow:var(--shadow-sm)}
+.chart-box h3{font-size:0.85rem;font-weight:800;color:var(--green-800);
+  margin-bottom:12px;padding-bottom:8px;border-bottom:var(--border)}
+.chart-box canvas{max-height:200px}
+
+/* EFFICIENCY BAR */
+.eff-row{display:flex;align-items:center;gap:14px;background:var(--white);
+  border:var(--border);border-radius:var(--radius);padding:14px 18px;
+  margin-bottom:18px;box-shadow:var(--shadow-sm);flex-wrap:wrap;gap:10px}
+.eff-lbl{font-size:0.8rem;color:var(--gray-700);font-weight:700;white-space:nowrap;min-width:80px}
+.eff-track{flex:1;min-width:120px;height:14px;background:var(--gray-200);border-radius:7px;overflow:hidden}
+.eff-fill{height:100%;border-radius:7px;background:linear-gradient(90deg,var(--green-300),var(--green-600));transition:width 0.6s}
+.eff-pill{font-size:0.8rem;font-weight:800;padding:4px 12px;border-radius:12px;white-space:nowrap}
+
+/* ALERTS */
+.alerts-panel{background:var(--white);border:var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:20px}
+.alert-row{display:flex;align-items:flex-start;gap:10px;padding:11px 15px;border-bottom:var(--border)}
+.alert-row:last-child{border-bottom:none}
+.alert-row.danger{border-left:4px solid var(--red-500)}
+.alert-row.warn{border-left:4px solid var(--yellow-500)}
+.alert-row.info{border-left:4px solid var(--green-400)}
+.alert-row.success{border-left:4px solid var(--green-600)}
+.alert-icon{font-size:1rem;flex-shrink:0;margin-top:2px}
+.alert-text strong{display:block;font-size:0.8rem;font-weight:700}
+.alert-text span{color:var(--gray-500);font-size:0.74rem}
+
+/* FORM GRID */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fgrid .full{grid-column:1/-1}
+.fsec{grid-column:1/-1;font-size:0.73rem;text-transform:uppercase;letter-spacing:0.9px;
+  color:var(--gray-400);font-weight:700;padding-bottom:7px;border-bottom:var(--border);margin-bottom:0;margin-top:6px}
+.faction{display:flex;gap:10px;margin-top:6px;flex-wrap:wrap}
+
+/* FILE UPLOAD */
+.file-zone{border:2px dashed var(--gray-300);border-radius:var(--radius);
+  padding:20px;text-align:center;cursor:pointer;color:var(--gray-500);
+  font-size:0.83rem;transition:border-color 0.18s}
+.file-zone:hover{border-color:var(--green-400)}
+.file-zone .fzi{font-size:1.5rem;display:block;margin-bottom:5px}
+
+/* TOGGLE SWITCH */
+.tog{position:relative;width:42px;height:22px;display:inline-block;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0}
+.tog-sl{position:absolute;inset:0;background:var(--gray-300);border-radius:11px;cursor:pointer;transition:background 0.2s}
+.tog-sl::before{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:var(--white);top:2px;left:2px;transition:transform 0.2s}
+.tog input:checked+.tog-sl{background:var(--green-600)}
+.tog input:checked+.tog-sl::before{transform:translateX(20px)}
+
+/* STOCK BAR */
+.stk-bar{height:7px;border-radius:4px;background:var(--gray-200);overflow:hidden;margin-top:4px}
+.stk-bar-fill{height:100%;border-radius:4px}
+
+/* CHECKBOXES FOR DAILY ITEMS */
+.item-check-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--gray-100)}
+.item-check-row:last-child{border-bottom:none}
+.item-check-row input[type=checkbox]{width:17px;height:17px;accent-color:var(--green-600);cursor:pointer}
+.item-check-row label{font-size:0.87rem;font-weight:600;cursor:pointer;flex:1}
+.item-qty-wrap{display:none;align-items:center;gap:6px}
+.item-qty-wrap.show{display:flex}
+.item-qty-wrap input{width:85px;padding:5px 8px;border:var(--border);border-radius:var(--radius-sm);font-size:0.82rem}
+.item-qty-wrap span{font-size:0.75rem;color:var(--gray-500)}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.52);
+  z-index:500;align-items:center;justify-content:center;padding:16px}
+.modal-bg.open{display:flex}
+.modal-box{background:var(--white);border-radius:var(--radius-lg);max-width:430px;width:100%;overflow:hidden;box-shadow:var(--shadow-md)}
+.modal-hd{background:var(--green-800);color:var(--white);padding:14px 18px;
+  display:flex;align-items:center;justify-content:space-between}
+.modal-hd h3{font-size:1rem;font-weight:800}
+.modal-close{background:none;border:none;color:var(--white);font-size:1.2rem;cursor:pointer;line-height:1}
+.modal-bd{padding:20px;font-size:0.9rem;color:var(--gray-700);line-height:1.6}
+.modal-ft{padding:13px 18px;border-top:var(--border);display:flex;gap:8px;justify-content:flex-end}
+
+/* TOAST */
+#toast{position:fixed;bottom:22px;right:22px;background:var(--green-800);color:var(--white);
+  padding:12px 18px;border-radius:var(--radius);font-size:0.85rem;font-weight:600;
+  z-index:9999;display:none;max-width:320px;box-shadow:var(--shadow-md);
+  border-left:4px solid var(--orange-500);line-height:1.4}
+#toast.show{display:block}
+
+/* SETTINGS PAGE */
+.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.set-row{display:flex;justify-content:space-between;align-items:center;
+  padding:11px 0;border-bottom:var(--border);gap:10px}
+.set-row:last-child{border-bottom:none}
+.set-row-lbl strong{display:block;font-size:0.85rem;font-weight:700}
+.set-row-lbl small{font-size:0.73rem;color:var(--gray-500)}
+
+/* PRINT STYLES */
+@media print{
+  #sidebar,#header,.no-print{display:none!important}
+  #content{margin:0!important;padding:0!important}
+  body{background:white}
+  #print-page-content{display:block!important}
+  .print-wrap{padding:15mm;font-family:'Noto Sans Devanagari',sans-serif}
+  table th{background:#2d6a4f!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  table tr:nth-child(even) td{background:#eef7f0!important;-webkit-print-color-adjust:exact}
+  .sig-row{display:flex;justify-content:space-between;margin-top:35px}
+  .sig-box{text-align:center;border-top:1px solid #333;padding-top:6px;flex:1;margin:0 8px}
+  .sig-box:first-child{margin-left:0}
+  .sig-box:last-child{margin-right:0}
+  @page{size:A4;margin:15mm}
+}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  :root{--sidebar-w:0px}
+  #sidebar{transform:translateX(-250px);width:250px!important}
+  #sidebar.open{transform:translateX(0)}
+  #sb-overlay{display:block;opacity:0;pointer-events:none;transition:opacity 0.24s}
+  #sb-overlay.visible{opacity:1;pointer-events:all}
+  #header{left:0}
+  #content{margin-left:0}
+  .hdr-toggle{display:block}
+  .charts-row{grid-template-columns:1fr}
+  .fgrid{grid-template-columns:1fr}
+  .fgrid .full{grid-column:1}
+  .set-grid{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .user-nm{display:none}
+  .hdr-school p{display:none}
+  #print-page-content{display:block}
+}
+@media(max-width:480px){
+  .stats-row{grid-template-columns:1fr}
+  .pg-head{flex-direction:column;align-items:flex-start}
+  .pg-head-right{width:100%}
+  #content{padding:14px}
+  .auth-body{padding:20px 18px}
+}
+</style>
+</head>
+<body>
+
+<!-- ====================== TRANSLATIONS ====================== -->
+<script>
+const TRANSLATIONS = {
+  en: {
+    app_name: "AnnaSahay",
+    app_tagline: "School Grain & Meal Register System",
+    ministry: "Ministry of Education – Mid-Day Meal Scheme",
+    sign_in: "Sign In",
+    sign_in_title: "Sign In to Your Account",
+    forgot_password: "Forgot Password",
+    forgot_title: "Reset Your Password",
+    back_to_login: "← Back to Login",
+    send_otp: "Send OTP",
+    select_role: "Select Role",
+    role_principal: "Principal",
+    role_cook: "Cook",
+    role_inspector: "Inspector",
+    school_id: "School ID / Username",
+    school_id_ph: "e.g. SCH-MH-2045",
+    password: "Password",
+    password_ph: "Enter your password",
+    registered_id: "Registered School ID",
+    registered_mobile: "Registered Mobile",
+    mobile_ph: "10-digit mobile number",
+    no_account: "New to system?",
+    contact_admin: "Contact Admin",
+    val_id_required: "School ID is required",
+    val_pass_required: "Password is required",
+    val_pass_short: "Password must be at least 4 characters",
+    val_id_req: "School ID is required",
+    // Nav
+    nav_main: "Main",
+    nav_data: "Data Entry",
+    nav_reports: "Reports",
+    nav_system: "System",
+    nav_dashboard: "Dashboard",
+    nav_daily: "Daily Register",
+    nav_stock: "Stock Management",
+    nav_monthly: "Monthly Summary",
+    nav_print: "Print Register",
+    nav_settings: "Settings",
+    nav_logout: "Logout",
+    // School header
+    school_name: "Govt. Primary School, Nashik No.5",
+    school_info: "Block: Nashik | Dist: Nashik | Maharashtra",
+    // Dashboard
+    dashboard: "Dashboard",
+    dash_sub: "Today's overview of meals, stock, and attendance",
+    total_students: "Total Students",
+    todays_attendance: "Today's Attendance",
+    stock_items: "Stock Items",
+    days_remaining: "Est. Days Remaining",
+    budget_used: "Budget Used",
+    new_entry: "+ New Entry",
+    alerts_title: "Alerts & Notifications",
+    alerts_active: "Active",
+    quick_stock: "Quick Stock Summary",
+    view_all: "View All →",
+    monthly_chart: "Monthly Grain Consumption (kg)",
+    attend_chart: "Attendance vs Meal Usage",
+    fin_efficiency: "Financial Efficiency",
+    enrolled: "Enrolled",
+    attendance_pct: "attendance",
+    low_stock: "Low Stock",
+    based_rice: "Based on rice stock",
+    of_budget: "of ₹22,000",
+    normal: "Normal",
+    critical: "Critical",
+    class_info: "Class 1–8",
+    // Alerts
+    alert_rice_title: "Low Stock: Rice",
+    alert_rice_msg: "Current: 18 kg | Est. 4 days remaining at current rate",
+    alert_dal_title: "Dal stock running low",
+    alert_dal_msg: "Current: 9 kg | Please raise requisition",
+    alert_delivery_title: "Delivery Scheduled",
+    alert_delivery_msg: "Wheat 80 kg expected tomorrow from Ramesh Traders",
+    // Stock table
+    item: "Item",
+    opening: "Opening",
+    received: "Received",
+    used: "Used",
+    balance: "Balance",
+    status: "Status",
+    wastage: "Wastage",
+    adequate: "Adequate",
+    low: "Low",
+    unit_label: "Unit",
+    last_updated: "Last Updated",
+    // Stock form
+    stock_mgmt: "Stock Management",
+    stock_sub: "Track grain and ingredient inventory",
+    add_stock: "+ Add Stock",
+    add_stock_title: "Add New Stock Entry",
+    close: "✕ Close",
+    item_name: "Item Name",
+    select_item: "-- Select Item --",
+    custom_item: "Custom Item Name",
+    custom_item_ph: "Enter item name",
+    quantity: "Quantity",
+    qty_ph: "e.g. 50",
+    unit: "Unit",
+    cost_per_unit: "Cost per Unit (₹)",
+    cost_ph: "e.g. 38",
+    total_cost: "Total Cost (₹)",
+    supplier: "Supplier Name",
+    supplier_ph: "e.g. Ramesh Traders",
+    date_received: "Date Received",
+    upload_invoice: "Upload Invoice",
+    upload_photo: "Upload Delivery Photo",
+    click_upload_inv: "Click to upload invoice (PDF/Image)",
+    click_upload_ph: "Click to upload delivery photo",
+    save_stock: "💾 Save Stock Entry",
+    cancel: "Cancel",
+    current_inventory: "Current Stock Inventory",
+    items_low: "Items Low",
+    total_received: "Total Received",
+    total_used: "Total Used",
+    current_balance: "Current Balance",
+    // Daily register
+    daily_register: "Daily Meal Register",
+    daily_sub: "Record daily meal distribution",
+    save_entry: "💾 Save Entry",
+    today_form: "Today's Entry Form",
+    date_label: "Date",
+    students_present: "Students Present",
+    students_ph: "e.g. 287",
+    meal_type: "Meal Type",
+    select_meal: "-- Select Meal --",
+    meal_lunch: "Lunch (Standard)",
+    meal_festival: "Lunch (Festival Special)",
+    meal_both: "Breakfast + Lunch",
+    meal_holiday: "No Meal (Holiday)",
+    menu_desc: "Menu Description",
+    menu_ph: "e.g. Rice, Dal, Sabji",
+    item_consumption: "Item-wise Consumption",
+    remarks: "Remarks / Notes",
+    remarks_ph: "Observations, wastage notes, inspections...",
+    cooked_by: "Cooked By",
+    cook_ph: "Name of cook",
+    save_btn: "💾 Save Entry",
+    reset: "Reset",
+    feb_register: "February 2026 – Daily Register",
+    print_btn: "🖨️ Print",
+    day: "Day",
+    present: "Present",
+    rice: "Rice (kg)",
+    wheat: "Wheat (kg)",
+    dal: "Dal (kg)",
+    oil: "Oil (L)",
+    salt: "Salt (kg)",
+    total_row: "TOTAL",
+    holiday: "Holiday",
+    today_label: "Today",
+    stock_delivery: "Stock delivery",
+    // Monthly
+    monthly_summary: "Monthly Summary",
+    monthly_sub: "Consolidated view for February 2026",
+    stock_summary: "Stock Summary (Item-wise)",
+    opening_stock: "Opening Stock",
+    closing_stock: "Closing Stock",
+    efficiency: "Efficiency",
+    good: "Good",
+    fin_summary: "Financial Summary",
+    allocated: "Budget Allocated",
+    spent: "Amount Spent",
+    remaining: "Remaining",
+    avg_cost: "Avg. Cost / Student / Day",
+    meals_served: "Total Meals Served",
+    budget_util: "Budget Utilization",
+    week_grain: "Week-wise Grain Usage (kg)",
+    item_pie: "Item-wise Consumption Share",
+    // Print
+    print_register: "Print Register",
+    print_sub: "A4 layout – ready for official submission",
+    print_action: "🖨️ Print",
+    download_pdf: "⬇ Download PDF",
+    school_details: "School Details",
+    monthly_summary_hdr: "Monthly Summary",
+    total_enrolled: "Total Enrolled",
+    school_type: "School Type",
+    school_type_val: "Govt. Primary (1–8)",
+    headmaster: "Headmaster",
+    cooks_name: "Cook's Name",
+    working_days: "Working Days",
+    total_fed: "Total Students Fed",
+    budget_util2: "Budget Utilized",
+    report_gen: "Report Generated",
+    daily_reg_hdr: "Daily Register – February 2026",
+    monthly_stock_hdr: "Monthly Stock Summary",
+    sig_cook: "Cook's Signature",
+    sig_teacher: "Teacher-in-Charge",
+    sig_hm: "Headmaster",
+    sig_beo: "Block Ed. Officer",
+    print_footer: "Generated by AnnaSahay – Govt. School Meal Register System | Confidential",
+    // Settings
+    settings: "Settings",
+    settings_sub: "Configure school and system preferences",
+    save_changes: "💾 Save Changes",
+    school_info_sec: "School Information",
+    school_name_lbl: "School Name",
+    udise_code: "UDISE Code",
+    block_taluka: "Block / Taluka",
+    district: "District",
+    state: "State",
+    students_enrolled: "Total Students Enrolled",
+    user_account: "User Account",
+    hm_name: "Headmaster Name",
+    mobile_no: "Mobile Number",
+    email_id: "Email ID",
+    cook_name: "Cook's Name",
+    change_pass: "Change Password",
+    new_pass: "New password",
+    confirm_pass: "Confirm new password",
+    sys_pref: "System Preferences",
+    low_stock_alert: "Low Stock Alert",
+    low_stock_desc: "Alert when stock falls below threshold",
+    daily_reminder: "Daily Reminder",
+    daily_reminder_desc: "Remind to enter data at 12 PM",
+    auto_calc: "Auto-calculate Quantities",
+    auto_calc_desc: "Based on students present",
+    show_wastage: "Show Wastage Column",
+    default_lang: "Default Language",
+    threshold_days: "Low Stock Threshold (days)",
+    budget_config: "Budget Configuration",
+    monthly_budget: "Monthly Budget (₹)",
+    per_student_rate: "Per Student Per Day (₹)",
+    state_grant: "State Grant (₹)",
+    central_grant: "Central Grant (₹)",
+    budget_warn: "Budget Warning Alert",
+    budget_warn_desc: "Alert when 80% budget is used",
+    // Logout modal
+    confirm_logout: "Confirm Logout",
+    logout_msg: "Are you sure you want to log out? Unsaved changes will be lost.",
+    yes_logout: "Yes, Logout",
+    // Confirm entry modal
+    confirm_entry: "Confirm Daily Entry",
+    confirm_entry_msg: "Save today's register? This will update stock balances.",
+    confirm_save: "✅ Confirm Save",
+    // Toast
+    stock_saved: "✅ Stock entry saved successfully!",
+    entry_saved: "✅ Daily entry saved! Stock balances updated.",
+    settings_saved: "✅ Settings saved successfully!",
+    otp_sent: "✅ OTP sent to registered mobile number!",
+    pdf_notice: "PDF download would connect to backend API.",
+  },
+  hi: {
+    app_name: "अन्नसहाय",
+    app_tagline: "विद्यालय अनाज एवं भोजन पंजी प्रणाली",
+    ministry: "शिक्षा मंत्रालय – मध्याह्न भोजन योजना",
+    sign_in: "लॉग इन",
+    sign_in_title: "अपने खाते में प्रवेश करें",
+    forgot_password: "पासवर्ड भूल गए",
+    forgot_title: "पासवर्ड रीसेट करें",
+    back_to_login: "← लॉगिन पर वापस",
+    send_otp: "OTP भेजें",
+    select_role: "भूमिका चुनें",
+    role_principal: "प्रधानाचार्य",
+    role_cook: "रसोइया",
+    role_inspector: "निरीक्षक",
+    school_id: "विद्यालय ID / उपयोगकर्ता नाम",
+    school_id_ph: "जैसे: SCH-MH-2045",
+    password: "पासवर्ड",
+    password_ph: "पासवर्ड दर्ज करें",
+    registered_id: "पंजीकृत विद्यालय ID",
+    registered_mobile: "पंजीकृत मोबाइल",
+    mobile_ph: "10 अंकों का मोबाइल नंबर",
+    no_account: "सिस्टम में नए हैं?",
+    contact_admin: "व्यवस्थापक से संपर्क करें",
+    val_id_required: "विद्यालय ID आवश्यक है",
+    val_pass_required: "पासवर्ड आवश्यक है",
+    val_pass_short: "पासवर्ड कम से कम 4 अक्षर का होना चाहिए",
+    val_id_req: "विद्यालय ID आवश्यक है",
+    nav_main: "मुख्य",
+    nav_data: "डेटा प्रविष्टि",
+    nav_reports: "रिपोर्ट",
+    nav_system: "सिस्टम",
+    nav_dashboard: "डैशबोर्ड",
+    nav_daily: "दैनिक पंजी",
+    nav_stock: "स्टॉक प्रबंधन",
+    nav_monthly: "मासिक सारांश",
+    nav_print: "प्रिंट पंजी",
+    nav_settings: "सेटिंग्स",
+    nav_logout: "लॉगआउट",
+    school_name: "सरकारी प्राथमिक शाला, नाशिक क्र.5",
+    school_info: "ब्लॉक: नाशिक | जिला: नाशिक | महाराष्ट्र",
+    dashboard: "डैशबोर्ड",
+    dash_sub: "भोजन, स्टॉक और उपस्थिति का आज का अवलोकन",
+    total_students: "कुल विद्यार्थी",
+    todays_attendance: "आज की उपस्थिति",
+    stock_items: "स्टॉक वस्तुएँ",
+    days_remaining: "अनुमानित दिन शेष",
+    budget_used: "बजट उपयोग",
+    new_entry: "+ नई प्रविष्टि",
+    alerts_title: "सतर्कता और सूचनाएँ",
+    alerts_active: "सक्रिय",
+    quick_stock: "त्वरित स्टॉक सारांश",
+    view_all: "सभी देखें →",
+    monthly_chart: "मासिक अनाज खपत (कि.ग्रा.)",
+    attend_chart: "उपस्थिति बनाम भोजन उपयोग",
+    fin_efficiency: "वित्तीय दक्षता",
+    enrolled: "पंजीकृत",
+    attendance_pct: "उपस्थिति",
+    low_stock: "कम स्टॉक",
+    based_rice: "चावल स्टॉक के आधार पर",
+    of_budget: "₹22,000 में से",
+    normal: "सामान्य",
+    critical: "गंभीर",
+    class_info: "कक्षा 1–8",
+    alert_rice_title: "कम स्टॉक: चावल",
+    alert_rice_msg: "वर्तमान: 18 कि.ग्रा. | वर्तमान दर पर लगभग 4 दिन शेष",
+    alert_dal_title: "दाल का स्टॉक कम हो रहा है",
+    alert_dal_msg: "वर्तमान: 9 कि.ग्रा. | कृपया माँग पत्र भेजें",
+    alert_delivery_title: "डिलीवरी निर्धारित है",
+    alert_delivery_msg: "गेहूँ 80 कि.ग्रा. कल रमेश ट्रेडर्स से आने की उम्मीद",
+    item: "वस्तु",
+    opening: "प्रारंभिक",
+    received: "प्राप्त",
+    used: "उपयोग",
+    balance: "शेष",
+    status: "स्थिति",
+    wastage: "बर्बादी",
+    adequate: "पर्याप्त",
+    low: "कम",
+    unit_label: "इकाई",
+    last_updated: "अंतिम अद्यतन",
+    stock_mgmt: "स्टॉक प्रबंधन",
+    stock_sub: "अनाज और सामग्री की सूची ट्रैक करें",
+    add_stock: "+ स्टॉक जोड़ें",
+    add_stock_title: "नई स्टॉक प्रविष्टि जोड़ें",
+    close: "✕ बंद करें",
+    item_name: "वस्तु का नाम",
+    select_item: "-- वस्तु चुनें --",
+    custom_item: "कस्टम वस्तु नाम",
+    custom_item_ph: "वस्तु का नाम दर्ज करें",
+    quantity: "मात्रा",
+    qty_ph: "जैसे: 50",
+    unit: "इकाई",
+    cost_per_unit: "प्रति इकाई लागत (₹)",
+    cost_ph: "जैसे: 38",
+    total_cost: "कुल लागत (₹)",
+    supplier: "आपूर्तिकर्ता नाम",
+    supplier_ph: "जैसे: रमेश ट्रेडर्स",
+    date_received: "प्राप्ति तिथि",
+    upload_invoice: "बीजक अपलोड करें",
+    upload_photo: "डिलीवरी फोटो अपलोड करें",
+    click_upload_inv: "बीजक अपलोड करने के लिए क्लिक करें (PDF/चित्र)",
+    click_upload_ph: "डिलीवरी फोटो अपलोड करने के लिए क्लिक करें",
+    save_stock: "💾 स्टॉक प्रविष्टि सहेजें",
+    cancel: "रद्द करें",
+    current_inventory: "वर्तमान स्टॉक सूची",
+    items_low: "वस्तुएँ कम हैं",
+    total_received: "कुल प्राप्त",
+    total_used: "कुल उपयोग",
+    current_balance: "वर्तमान शेष",
+    daily_register: "दैनिक भोजन पंजी",
+    daily_sub: "दैनिक भोजन वितरण दर्ज करें",
+    save_entry: "💾 प्रविष्टि सहेजें",
+    today_form: "आज की प्रविष्टि फॉर्म",
+    date_label: "तिथि",
+    students_present: "उपस्थित विद्यार्थी",
+    students_ph: "जैसे: 287",
+    meal_type: "भोजन प्रकार",
+    select_meal: "-- भोजन चुनें --",
+    meal_lunch: "दोपहर का भोजन (सामान्य)",
+    meal_festival: "दोपहर का भोजन (उत्सव विशेष)",
+    meal_both: "नाश्ता + दोपहर का भोजन",
+    meal_holiday: "भोजन नहीं (अवकाश)",
+    menu_desc: "मेनू विवरण",
+    menu_ph: "जैसे: चावल, दाल, सब्जी",
+    item_consumption: "वस्तुवार खपत",
+    remarks: "टिप्पणी / नोट्स",
+    remarks_ph: "अवलोकन, बर्बादी नोट, निरीक्षण...",
+    cooked_by: "किसने पकाया",
+    cook_ph: "रसोइए का नाम",
+    save_btn: "💾 प्रविष्टि सहेजें",
+    reset: "रीसेट",
+    feb_register: "फरवरी 2026 – दैनिक पंजी",
+    print_btn: "🖨️ प्रिंट",
+    day: "दिन",
+    present: "उपस्थित",
+    rice: "चावल (कि.ग्रा.)",
+    wheat: "गेहूँ (कि.ग्रा.)",
+    dal: "दाल (कि.ग्रा.)",
+    oil: "तेल (लि.)",
+    salt: "नमक (कि.ग्रा.)",
+    total_row: "कुल",
+    holiday: "अवकाश",
+    today_label: "आज",
+    stock_delivery: "स्टॉक डिलीवरी",
+    monthly_summary: "मासिक सारांश",
+    monthly_sub: "फरवरी 2026 का समेकित दृश्य",
+    stock_summary: "स्टॉक सारांश (वस्तुवार)",
+    opening_stock: "प्रारंभिक स्टॉक",
+    closing_stock: "समापन स्टॉक",
+    efficiency: "दक्षता",
+    good: "अच्छा",
+    fin_summary: "वित्तीय सारांश",
+    allocated: "आवंटित बजट",
+    spent: "व्यय राशि",
+    remaining: "शेष",
+    avg_cost: "औसत लागत / विद्यार्थी / दिन",
+    meals_served: "कुल भोजन परोसे गए",
+    budget_util: "बजट उपयोग",
+    week_grain: "सप्ताहवार अनाज उपयोग (कि.ग्रा.)",
+    item_pie: "वस्तुवार खपत हिस्सा",
+    print_register: "प्रिंट पंजी",
+    print_sub: "A4 लेआउट – आधिकारिक प्रस्तुति के लिए",
+    print_action: "🖨️ प्रिंट",
+    download_pdf: "⬇ PDF डाउनलोड",
+    school_details: "विद्यालय विवरण",
+    monthly_summary_hdr: "मासिक सारांश",
+    total_enrolled: "कुल पंजीकृत",
+    school_type: "विद्यालय प्रकार",
+    school_type_val: "सरकारी प्राथमिक (1–8)",
+    headmaster: "प्रधानाचार्य",
+    cooks_name: "रसोइए का नाम",
+    working_days: "कार्य दिवस",
+    total_fed: "कुल विद्यार्थियों को भोजन",
+    budget_util2: "बजट उपयोग",
+    report_gen: "रिपोर्ट तिथि",
+    daily_reg_hdr: "दैनिक पंजी – फरवरी 2026",
+    monthly_stock_hdr: "मासिक स्टॉक सारांश",
+    sig_cook: "रसोइए के हस्ताक्षर",
+    sig_teacher: "प्रभारी शिक्षक",
+    sig_hm: "प्रधानाचार्य",
+    sig_beo: "खंड शिक्षा अधिकारी",
+    print_footer: "अन्नसहाय द्वारा तैयार – सरकारी विद्यालय भोजन पंजी प्रणाली | गोपनीय",
+    settings: "सेटिंग्स",
+    settings_sub: "विद्यालय एवं सिस्टम प्राथमिकताएँ कॉन्फ़िगर करें",
+    save_changes: "💾 परिवर्तन सहेजें",
+    school_info_sec: "विद्यालय की जानकारी",
+    school_name_lbl: "विद्यालय का नाम",
+    udise_code: "UDISE कोड",
+    block_taluka: "ब्लॉक / तालुका",
+    district: "जिला",
+    state: "राज्य",
+    students_enrolled: "कुल नामांकित विद्यार्थी",
+    user_account: "उपयोगकर्ता खाता",
+    hm_name: "प्रधानाचार्य नाम",
+    mobile_no: "मोबाइल नंबर",
+    email_id: "ईमेल ID",
+    cook_name: "रसोइए का नाम",
+    change_pass: "पासवर्ड बदलें",
+    new_pass: "नया पासवर्ड",
+    confirm_pass: "पासवर्ड की पुष्टि करें",
+    sys_pref: "सिस्टम प्राथमिकताएँ",
+    low_stock_alert: "कम स्टॉक सतर्कता",
+    low_stock_desc: "जब स्टॉक सीमा से कम हो तो सतर्क करें",
+    daily_reminder: "दैनिक स्मरण",
+    daily_reminder_desc: "दोपहर 12 बजे डेटा दर्ज करने की याद दिलाएँ",
+    auto_calc: "मात्रा स्वतः गणना",
+    auto_calc_desc: "उपस्थित विद्यार्थियों के आधार पर",
+    show_wastage: "बर्बादी कॉलम दिखाएँ",
+    default_lang: "डिफ़ॉल्ट भाषा",
+    threshold_days: "कम स्टॉक सीमा (दिन)",
+    budget_config: "बजट कॉन्फ़िगरेशन",
+    monthly_budget: "मासिक बजट (₹)",
+    per_student_rate: "प्रति विद्यार्थी प्रतिदिन (₹)",
+    state_grant: "राज्य अनुदान (₹)",
+    central_grant: "केंद्रीय अनुदान (₹)",
+    budget_warn: "बजट चेतावनी सतर्कता",
+    budget_warn_desc: "80% बजट उपयोग होने पर सतर्क करें",
+    confirm_logout: "लॉगआउट की पुष्टि",
+    logout_msg: "क्या आप लॉगआउट करना चाहते हैं? असहेजे परिवर्तन खो जाएँगे।",
+    yes_logout: "हाँ, लॉगआउट करें",
+    confirm_entry: "दैनिक प्रविष्टि की पुष्टि",
+    confirm_entry_msg: "आज की पंजी सहेजें? यह स्टॉक शेष अद्यतन करेगा।",
+    confirm_save: "✅ सहेजने की पुष्टि",
+    stock_saved: "✅ स्टॉक प्रविष्टि सफलतापूर्वक सहेजी गई!",
+    entry_saved: "✅ दैनिक प्रविष्टि सहेजी! स्टॉक शेष अद्यतन।",
+    settings_saved: "✅ सेटिंग्स सफलतापूर्वक सहेजी गईं!",
+    otp_sent: "✅ OTP पंजीकृत मोबाइल नंबर पर भेजा गया!",
+    pdf_notice: "PDF डाउनलोड बैकएंड API से जुड़ेगा।",
+  },
+  mr: {
+    app_name: "अन्नसहाय",
+    app_tagline: "शाळा धान्य व जेवण नोंदणी प्रणाली",
+    ministry: "शिक्षण मंत्रालय – मध्यान्ह भोजन योजना",
+    sign_in: "प्रवेश करा",
+    sign_in_title: "आपल्या खात्यात प्रवेश करा",
+    forgot_password: "पासवर्ड विसरलात",
+    forgot_title: "पासवर्ड रीसेट करा",
+    back_to_login: "← लॉगिनवर परत",
+    send_otp: "OTP पाठवा",
+    select_role: "भूमिका निवडा",
+    role_principal: "मुख्याध्यापक",
+    role_cook: "स्वयंपाकी",
+    role_inspector: "निरीक्षक",
+    school_id: "शाळा ID / वापरकर्ता नाव",
+    school_id_ph: "उदा: SCH-MH-2045",
+    password: "पासवर्ड",
+    password_ph: "पासवर्ड टाका",
+    registered_id: "नोंदणीकृत शाळा ID",
+    registered_mobile: "नोंदणीकृत मोबाइल",
+    mobile_ph: "10 अंकी मोबाइल नंबर",
+    no_account: "प्रणालीत नवीन आहात?",
+    contact_admin: "प्रशासकाशी संपर्क करा",
+    val_id_required: "शाळा ID आवश्यक आहे",
+    val_pass_required: "पासवर्ड आवश्यक आहे",
+    val_pass_short: "पासवर्ड किमान 4 अक्षरांचा असावा",
+    val_id_req: "शाळा ID आवश्यक आहे",
+    nav_main: "मुख्य",
+    nav_data: "डेटा नोंदणी",
+    nav_reports: "अहवाल",
+    nav_system: "प्रणाली",
+    nav_dashboard: "डॅशबोर्ड",
+    nav_daily: "दैनंदिन नोंदणी",
+    nav_stock: "साठा व्यवस्थापन",
+    nav_monthly: "मासिक सारांश",
+    nav_print: "नोंदणी छापा",
+    nav_settings: "सेटिंग्स",
+    nav_logout: "बाहेर पडा",
+    school_name: "शासकीय प्राथमिक शाळा, नाशिक क्र.5",
+    school_info: "तालुका: नाशिक | जिल्हा: नाशिक | महाराष्ट्र",
+    dashboard: "डॅशबोर्ड",
+    dash_sub: "जेवण, साठा आणि उपस्थितीचे आजचे अवलोकन",
+    total_students: "एकूण विद्यार्थी",
+    todays_attendance: "आजची उपस्थिती",
+    stock_items: "साठा वस्तू",
+    days_remaining: "अंदाजे दिवस शिल्लक",
+    budget_used: "अर्थसंकल्प वापर",
+    new_entry: "+ नवीन नोंद",
+    alerts_title: "सूचना व संदेश",
+    alerts_active: "सक्रिय",
+    quick_stock: "त्वरित साठा सारांश",
+    view_all: "सर्व पहा →",
+    monthly_chart: "मासिक धान्य वापर (कि.ग्रा.)",
+    attend_chart: "उपस्थिती विरुद्ध जेवण वापर",
+    fin_efficiency: "आर्थिक कार्यक्षमता",
+    enrolled: "नोंदणीकृत",
+    attendance_pct: "उपस्थिती",
+    low_stock: "कमी साठा",
+    based_rice: "तांदूळ साठ्यावर आधारित",
+    of_budget: "₹22,000 पैकी",
+    normal: "सामान्य",
+    critical: "गंभीर",
+    class_info: "इयत्ता 1–8",
+    alert_rice_title: "कमी साठा: तांदूळ",
+    alert_rice_msg: "सध्या: 18 कि.ग्रा. | सद्य दराने अंदाजे 4 दिवस शिल्लक",
+    alert_dal_title: "डाळीचा साठा कमी होत आहे",
+    alert_dal_msg: "सध्या: 9 कि.ग्रा. | कृपया मागणी पत्र पाठवा",
+    alert_delivery_title: "वितरण नियोजित आहे",
+    alert_delivery_msg: "उद्या रमेश ट्रेडर्सकडून 80 कि.ग्रा. गहू येण्याची अपेक्षा",
+    item: "वस्तू",
+    opening: "प्रारंभिक",
+    received: "प्राप्त",
+    used: "वापर",
+    balance: "शिल्लक",
+    status: "स्थिती",
+    wastage: "नासाडी",
+    adequate: "पुरेसा",
+    low: "कमी",
+    unit_label: "एकक",
+    last_updated: "शेवटचे अद्ययावत",
+    stock_mgmt: "साठा व्यवस्थापन",
+    stock_sub: "धान्य व साहित्याचा साठा नोंदवा",
+    add_stock: "+ साठा जोडा",
+    add_stock_title: "नवीन साठा नोंद जोडा",
+    close: "✕ बंद करा",
+    item_name: "वस्तूचे नाव",
+    select_item: "-- वस्तू निवडा --",
+    custom_item: "सानुकूल वस्तूचे नाव",
+    custom_item_ph: "वस्तूचे नाव टाका",
+    quantity: "प्रमाण",
+    qty_ph: "उदा: 50",
+    unit: "एकक",
+    cost_per_unit: "प्रति एकक किंमत (₹)",
+    cost_ph: "उदा: 38",
+    total_cost: "एकूण किंमत (₹)",
+    supplier: "पुरवठादाराचे नाव",
+    supplier_ph: "उदा: रमेश ट्रेडर्स",
+    date_received: "प्राप्ती दिनांक",
+    upload_invoice: "बीजक अपलोड करा",
+    upload_photo: "वितरण फोटो अपलोड करा",
+    click_upload_inv: "बीजक अपलोड करण्यासाठी क्लिक करा (PDF/चित्र)",
+    click_upload_ph: "वितरण फोटो अपलोड करण्यासाठी क्लिक करा",
+    save_stock: "💾 साठा नोंद जतन करा",
+    cancel: "रद्द करा",
+    current_inventory: "सध्याची साठा यादी",
+    items_low: "वस्तू कमी आहेत",
+    total_received: "एकूण प्राप्त",
+    total_used: "एकूण वापर",
+    current_balance: "सध्याचे शिल्लक",
+    daily_register: "दैनंदिन जेवण नोंदणी",
+    daily_sub: "दैनंदिन जेवण वितरण नोंदवा",
+    save_entry: "💾 नोंद जतन करा",
+    today_form: "आजची नोंद फॉर्म",
+    date_label: "दिनांक",
+    students_present: "उपस्थित विद्यार्थी",
+    students_ph: "उदा: 287",
+    meal_type: "जेवणाचा प्रकार",
+    select_meal: "-- जेवण निवडा --",
+    meal_lunch: "दुपारचे जेवण (सामान्य)",
+    meal_festival: "दुपारचे जेवण (उत्सव विशेष)",
+    meal_both: "नाश्ता + दुपारचे जेवण",
+    meal_holiday: "जेवण नाही (सुट्टी)",
+    menu_desc: "मेनू तपशील",
+    menu_ph: "उदा: तांदूळ, डाळ, भाजी",
+    item_consumption: "वस्तूनिहाय वापर",
+    remarks: "टिप्पणी / नोट्स",
+    remarks_ph: "निरीक्षणे, नासाडी नोट्स, तपासणी...",
+    cooked_by: "कोणी शिजवले",
+    cook_ph: "स्वयंपाक्याचे नाव",
+    save_btn: "💾 नोंद जतन करा",
+    reset: "रीसेट",
+    feb_register: "फेब्रुवारी 2026 – दैनंदिन नोंदणी",
+    print_btn: "🖨️ छापा",
+    day: "दिवस",
+    present: "उपस्थित",
+    rice: "तांदूळ (कि.ग्रा.)",
+    wheat: "गहू (कि.ग्रा.)",
+    dal: "डाळ (कि.ग्रा.)",
+    oil: "तेल (लि.)",
+    salt: "मीठ (कि.ग्रा.)",
+    total_row: "एकूण",
+    holiday: "सुट्टी",
+    today_label: "आज",
+    stock_delivery: "साठा वितरण",
+    monthly_summary: "मासिक सारांश",
+    monthly_sub: "फेब्रुवारी 2026 चे एकत्रित दृश्य",
+    stock_summary: "साठा सारांश (वस्तूनिहाय)",
+    opening_stock: "प्रारंभिक साठा",
+    closing_stock: "समाप्ती साठा",
+    efficiency: "कार्यक्षमता",
+    good: "चांगले",
+    fin_summary: "आर्थिक सारांश",
+    allocated: "वाटप केलेला अर्थसंकल्प",
+    spent: "खर्च केलेली रक्कम",
+    remaining: "शिल्लक",
+    avg_cost: "सरासरी खर्च / विद्यार्थी / दिन",
+    meals_served: "एकूण जेवण दिले",
+    budget_util: "अर्थसंकल्प वापर",
+    week_grain: "आठवडेनिहाय धान्य वापर (कि.ग्रा.)",
+    item_pie: "वस्तूनिहाय वापर हिस्सा",
+    print_register: "नोंदणी छापा",
+    print_sub: "A4 लेआउट – अधिकृत सादरीकरणासाठी",
+    print_action: "🖨️ छापा",
+    download_pdf: "⬇ PDF डाउनलोड",
+    school_details: "शाळेचे तपशील",
+    monthly_summary_hdr: "मासिक सारांश",
+    total_enrolled: "एकूण नोंदणीकृत",
+    school_type: "शाळेचा प्रकार",
+    school_type_val: "शासकीय प्राथमिक (1–8)",
+    headmaster: "मुख्याध्यापक",
+    cooks_name: "स्वयंपाक्याचे नाव",
+    working_days: "कार्य दिवस",
+    total_fed: "एकूण विद्यार्थ्यांना जेवण",
+    budget_util2: "अर्थसंकल्प वापर",
+    report_gen: "अहवाल तयार केला",
+    daily_reg_hdr: "दैनंदिन नोंदणी – फेब्रुवारी 2026",
+    monthly_stock_hdr: "मासिक साठा सारांश",
+    sig_cook: "स्वयंपाक्याची सही",
+    sig_teacher: "प्रभारी शिक्षक",
+    sig_hm: "मुख्याध्यापक",
+    sig_beo: "गट शिक्षण अधिकारी",
+    print_footer: "अन्नसहाय द्वारे तयार – शासकीय शाळा जेवण नोंदणी प्रणाली | गोपनीय",
+    settings: "सेटिंग्स",
+    settings_sub: "शाळा आणि प्रणाली प्राधान्ये कॉन्फिगर करा",
+    save_changes: "💾 बदल जतन करा",
+    school_info_sec: "शाळेची माहिती",
+    school_name_lbl: "शाळेचे नाव",
+    udise_code: "UDISE कोड",
+    block_taluka: "गट / तालुका",
+    district: "जिल्हा",
+    state: "राज्य",
+    students_enrolled: "एकूण नोंदणीकृत विद्यार्थी",
+    user_account: "वापरकर्ता खाते",
+    hm_name: "मुख्याध्यापकाचे नाव",
+    mobile_no: "मोबाइल नंबर",
+    email_id: "ईमेल ID",
+    cook_name: "स्वयंपाक्याचे नाव",
+    change_pass: "पासवर्ड बदला",
+    new_pass: "नवीन पासवर्ड",
+    confirm_pass: "पासवर्डची पुष्टी करा",
+    sys_pref: "प्रणाली प्राधान्ये",
+    low_stock_alert: "कमी साठा सूचना",
+    low_stock_desc: "साठा मर्यादेपेक्षा कमी झाल्यावर सूचित करा",
+    daily_reminder: "दैनंदिन स्मरण",
+    daily_reminder_desc: "दुपारी 12 वाजता डेटा नोंदण्याची आठवण करून द्या",
+    auto_calc: "प्रमाण स्वयंचलित गणना",
+    auto_calc_desc: "उपस्थित विद्यार्थ्यांच्या आधारे",
+    show_wastage: "नासाडी स्तंभ दाखवा",
+    default_lang: "डीफॉल्ट भाषा",
+    threshold_days: "कमी साठा मर्यादा (दिवस)",
+    budget_config: "अर्थसंकल्प कॉन्फिगरेशन",
+    monthly_budget: "मासिक अर्थसंकल्प (₹)",
+    per_student_rate: "प्रति विद्यार्थी प्रतिदिन (₹)",
+    state_grant: "राज्य अनुदान (₹)",
+    central_grant: "केंद्रीय अनुदान (₹)",
+    budget_warn: "अर्थसंकल्प चेतावणी सूचना",
+    budget_warn_desc: "80% अर्थसंकल्प वापरल्यावर सूचित करा",
+    confirm_logout: "बाहेर पडण्याची पुष्टी",
+    logout_msg: "आपण बाहेर पडू इच्छिता का? न जतन केलेले बदल गमावले जातील।",
+    yes_logout: "होय, बाहेर पडा",
+    confirm_entry: "दैनंदिन नोंदीची पुष्टी",
+    confirm_entry_msg: "आजची नोंदणी जतन करायची? हे साठा शिल्लक अद्ययावत करेल।",
+    confirm_save: "✅ जतन करण्याची पुष्टी",
+    stock_saved: "✅ साठा नोंद यशस्वीरित्या जतन केली!",
+    entry_saved: "✅ दैनंदिन नोंद जतन! साठा शिल्लक अद्ययावत.",
+    settings_saved: "✅ सेटिंग्स यशस्वीरित्या जतन केल्या!",
+    otp_sent: "✅ OTP नोंदणीकृत मोबाइल नंबरवर पाठवला!",
+    pdf_notice: "PDF डाउनलोड बॅकएंड API शी जोडले जाईल.",
+  }
+};
+
+// ITEMS translation
+const ITEM_NAMES = {
+  en: ['Rice','Wheat','Dal (Toor)','Dal (Moong)','Oil (Sunflower)','Salt','Sugar','Spices Mix'],
+  hi: ['चावल','गेहूँ','दाल (तुअर)','दाल (मूंग)','तेल (सूरजमुखी)','नमक','चीनी','मसाला मिश्रण'],
+  mr: ['तांदूळ','गहू','डाळ (तूर)','डाळ (मूग)','तेल (सूर्यफूल)','मीठ','साखर','मसाल्याचे मिश्रण']
+};
+
+const ITEM_UNITS = ['kg','kg','kg','kg','L','kg','kg','kg'];
+
+// MOCK DATA
+const STOCK_DATA = [
+  {opening:80,received:50,used:112,wastage:0.8},
+  {opening:60,received:40,used:68,wastage:1.2},
+  {opening:30,received:20,used:41,wastage:0},
+  {opening:10,received:8,used:14,wastage:0},
+  {opening:10,received:8,used:14,wastage:0.2},
+  {opening:5,received:3,used:4,wastage:0},
+  {opening:6,received:4,used:7,wastage:0.1},
+  {opening:2,received:1,used:2,wastage:0},
+];
+
+const DAILY_DATA = [
+  {p:0,meal:'holiday',rice:0,wheat:0,dal:0,oil:0,salt:0,rem:'holiday'},
+  {p:294,meal:'lunch',rice:8.8,wheat:5.9,dal:2.9,oil:1.0,salt:0.3,rem:''},
+  {p:281,meal:'lunch',rice:8.4,wheat:5.6,dal:2.8,oil:0.9,salt:0.3,rem:''},
+  {p:295,meal:'lunch',rice:8.9,wheat:5.9,dal:3.0,oil:1.0,salt:0.3,rem:''},
+  {p:288,meal:'lunch',rice:8.6,wheat:5.8,dal:2.9,oil:1.0,salt:0.3,rem:''},
+  {p:276,meal:'lunch',rice:8.3,wheat:5.5,dal:2.8,oil:0.9,salt:0.3,rem:''},
+  {p:0,meal:'holiday',rice:0,wheat:0,dal:0,oil:0,salt:0,rem:'holiday'},
+  {p:0,meal:'holiday',rice:0,wheat:0,dal:0,oil:0,salt:0,rem:'holiday'},
+  {p:290,meal:'lunch',rice:8.7,wheat:5.8,dal:2.9,oil:1.0,salt:0.3,rem:''},
+  {p:283,meal:'lunch',rice:8.5,wheat:5.7,dal:2.8,oil:0.9,salt:0.3,rem:'stock_delivery'},
+  {p:297,meal:'lunch',rice:8.9,wheat:5.9,dal:3.0,oil:1.0,salt:0.3,rem:''},
+  {p:285,meal:'lunch',rice:8.6,wheat:5.7,dal:2.9,oil:1.0,salt:0.3,rem:''},
+  {p:279,meal:'lunch',rice:8.4,wheat:5.6,dal:2.8,oil:0.9,salt:0.3,rem:''},
+  {p:0,meal:'holiday',rice:0,wheat:0,dal:0,oil:0,salt:0,rem:'holiday'},
+  {p:0,meal:'holiday',rice:0,wheat:0,dal:0,oil:0,salt:0,rem:'holiday'},
+  {p:286,meal:'lunch',rice:8.6,wheat:5.7,dal:2.9,oil:0.9,salt:0.3,rem:''},
+  {p:280,meal:'lunch',rice:8.4,wheat:5.6,dal:2.8,oil:1.0,salt:0.3,rem:''},
+  {p:283,meal:'lunch',rice:8.5,wheat:5.7,dal:2.9,oil:0.9,salt:0.3,rem:'today_label'},
+];
+
+const DAYS_EN = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat','Sun','Sun','Mon','Tue','Wed','Thu','Fri','Sat','Sun','Mon','Tue','Wed'];
+const DAYS_HI = ['रवि','सोम','मंगल','बुध','गुरु','शुक्र','शनि','रवि','रवि','सोम','मंगल','बुध','गुरु','शुक्र','शनि','रवि','सोम','मंगल','बुध'];
+const DAYS_MR = ['रवि','सोम','मंगळ','बुध','गुरु','शुक्र','शनि','रवि','रवि','सोम','मंगळ','बुध','गुरु','शुक्र','शनि','रवि','सोम','मंगळ','बुध'];
+
+const DATE_LABELS = [
+  '01 Feb','02 Feb','03 Feb','04 Feb','05 Feb','06 Feb','07 Feb','08 Feb',
+  '09 Feb','10 Feb','11 Feb','12 Feb','13 Feb','14 Feb','15 Feb','16 Feb','17 Feb','18 Feb'
+];
+
+// ===== STATE =====
+let lang = 'en';
+let currentRole = 'Principal';
+let charts = {};
+
+// ===== TRANSLATE =====
+function t(key) {
+  return (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS['en'][key] || key;
+}
+
+function applyLang() {
+  // Update all [data-t] elements
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const key = el.getAttribute('data-t');
+    const attr = el.getAttribute('data-t-attr');
+    if (attr) {
+      el.setAttribute(attr, t(key));
+    } else {
+      el.textContent = t(key);
+    }
+  });
+  // Update dynamic content
+  renderDailyTable();
+  renderStockTable();
+  renderPrint();
+  updateAlerts();
+  updateChartLabels();
+  updateSelectOptions();
+  // Update HTML lang
+  document.documentElement.lang = lang === 'mr' ? 'mr' : lang === 'hi' ? 'hi' : 'en';
+}
+
+function setLang(l) {
+  lang = l;
+  document.querySelectorAll('.lang-bar button').forEach((b,i) => {
+    b.classList.toggle('active', (l==='en'&&i===0)||(l==='hi'&&i===1)||(l==='mr'&&i===2));
+  });
+  applyLang();
+}
+
+function updateSelectOptions() {
+  const mealSel = document.getElementById('daily-meal');
+  if (mealSel) {
+    mealSel.options[0].text = t('select_meal');
+    mealSel.options[1].text = t('meal_lunch');
+    mealSel.options[2].text = t('meal_festival');
+    mealSel.options[3].text = t('meal_both');
+    mealSel.options[4].text = t('meal_holiday');
+  }
+  const itemSel = document.getElementById('stock-item');
+  if (itemSel && itemSel.options.length > 1) {
+    itemSel.options[0].text = t('select_item');
+    const itemNames = ITEM_NAMES[lang];
+    for (let i = 0; i < itemNames.length; i++) {
+      if (itemSel.options[i+1]) itemSel.options[i+1].text = itemNames[i];
+    }
+    const last = itemSel.options[itemSel.options.length-1];
+    if (last && last.value === 'custom') {
+      last.text = lang === 'mr' ? '+ सानुकूल वस्तू जोडा' : lang === 'hi' ? '+ कस्टम वस्तु जोड़ें' : '+ Add Custom Item';
+    }
+  }
+  buildItemChecklist();
+}
+
+function updateAlerts() {
+  const ap = document.getElementById('alerts-container');
+  if (!ap) return;
+  ap.innerHTML = `
+    <div class="alert-row danger">
+      <span class="alert-icon">🔴</span>
+      <div class="alert-text">
+        <strong>${t('alert_rice_title')}</strong>
+        <span>${t('alert_rice_msg')}</span>
+      </div>
+    </div>
+    <div class="alert-row warn">
+      <span class="alert-icon">🟡</span>
+      <div class="alert-text">
+        <strong>${t('alert_dal_title')}</strong>
+        <span>${t('alert_dal_msg')}</span>
+      </div>
+    </div>
+    <div class="alert-row info">
+      <span class="alert-icon">🟢</span>
+      <div class="alert-text">
+        <strong>${t('alert_delivery_title')}</strong>
+        <span>${t('alert_delivery_msg')}</span>
+      </div>
+    </div>
+  `;
+}
+
+function updateChartLabels() {
+  if (charts.consumption) {
+    charts.consumption.data.datasets[0].label = ITEM_NAMES[lang][0];
+    charts.consumption.data.datasets[1].label = ITEM_NAMES[lang][1];
+    charts.consumption.data.datasets[2].label = ITEM_NAMES[lang][2];
+    charts.consumption.options.plugins.title.text = t('monthly_chart');
+    charts.consumption.update();
+  }
+  if (charts.attendance) {
+    charts.attendance.data.datasets[0].label = t('todays_attendance');
+    charts.attendance.data.datasets[1].label = lang==='mr'?'जेवण दिले':lang==='hi'?'भोजन परोसे':'Meals Served';
+    charts.attendance.options.plugins.title.text = t('attend_chart');
+    charts.attendance.update();
+  }
+  if (charts.grain) {
+    charts.grain.data.datasets[0].label = ITEM_NAMES[lang][0];
+    charts.grain.data.datasets[1].label = ITEM_NAMES[lang][1];
+    charts.grain.data.datasets[2].label = ITEM_NAMES[lang][2];
+    charts.grain.options.plugins.title.text = t('week_grain');
+    charts.grain.update();
+  }
+  if (charts.pie) {
+    charts.pie.data.labels = ITEM_NAMES[lang].slice(0,5).concat([lang==='mr'?'इतर':lang==='hi'?'अन्य':'Other']);
+    charts.pie.options.plugins.title.text = t('item_pie');
+    charts.pie.update();
+  }
+}
+</script>
+
+<!-- ====================== AUTH ====================== -->
+<div id="auth-wrapper">
+  <div class="auth-card" id="login-card">
+    <div class="auth-top">
+      <div class="emblem">🌾</div>
+      <h1 data-t="app_name">AnnaSahay</h1>
+      <p class="subtitle" data-t="app_tagline">School Grain & Meal Register System</p>
+    </div>
+    <div class="auth-ribbon" data-t="ministry">Ministry of Education – Mid-Day Meal Scheme</div>
+    <div class="auth-body">
+      <!-- Lang selector on login page -->
+      <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+        <div class="lang-bar">
+          <button class="active" onclick="setLang('en')">EN</button>
+          <button onclick="setLang('hi')">हि</button>
+          <button onclick="setLang('mr')">म</button>
+        </div>
+      </div>
+      <h2 data-t="sign_in_title">Sign In to Your Account</h2>
+      <div class="fgrp" style="margin-top:14px">
+        <label data-t="select_role">Select Role</label>
+        <div class="role-grid">
+          <div class="role-btn active" onclick="selectRole(this,'Principal')">
+            <span class="ri">🏫</span><span data-t="role_principal">Principal</span>
+          </div>
+          <div class="role-btn" onclick="selectRole(this,'Cook')">
+            <span class="ri">👨‍🍳</span><span data-t="role_cook">Cook</span>
+          </div>
+          <div class="role-btn" onclick="selectRole(this,'Inspector')">
+            <span class="ri">🔍</span><span data-t="role_inspector">Inspector</span>
+          </div>
+        </div>
+      </div>
+      <div class="fgrp">
+        <label data-t="school_id">School ID / Username</label>
+        <input type="text" id="l-user" data-t="school_id_ph" data-t-attr="placeholder" placeholder="e.g. SCH-MH-2045" />
+        <div class="emsg" id="err-user" data-t="val_id_required">School ID is required</div>
+      </div>
+      <div class="fgrp">
+        <label data-t="password">Password</label>
+        <input type="password" id="l-pass" data-t="password_ph" data-t-attr="placeholder" placeholder="Enter your password" />
+        <div class="emsg" id="err-pass" data-t="val_pass_required">Password is required</div>
+      </div>
+      <button class="btn btn-green btn-full btn-lg" onclick="doLogin()" style="margin-top:4px">
+        <span data-t="sign_in">Sign In</span> →
+      </button>
+      <div class="auth-footer" style="margin-top:14px">
+        <a href="#" onclick="showForgot()" data-t="forgot_password">Forgot Password</a> &nbsp;|&nbsp;
+        <span data-t="no_account">New to system?</span> <a href="#" data-t="contact_admin">Contact Admin</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-card" id="forgot-card" style="display:none">
+    <div class="auth-top">
+      <div class="emblem">🔑</div>
+      <h1 data-t="app_name">AnnaSahay</h1>
+      <p class="subtitle" data-t="forgot_password">Forgot Password</p>
+    </div>
+    <div class="auth-ribbon" data-t="ministry">Ministry of Education – Mid-Day Meal Scheme</div>
+    <div class="auth-body">
+      <h2 data-t="forgot_title">Reset Your Password</h2>
+      <div class="fgrp" style="margin-top:14px">
+        <label data-t="registered_id">Registered School ID</label>
+        <input type="text" id="f-id" data-t="school_id_ph" data-t-attr="placeholder" placeholder="e.g. SCH-MH-2045"/>
+        <div class="emsg" id="err-fid" data-t="val_id_req">School ID is required</div>
+      </div>
+      <div class="fgrp">
+        <label data-t="registered_mobile">Registered Mobile</label>
+        <input type="tel" data-t="mobile_ph" data-t-attr="placeholder" placeholder="10-digit mobile number"/>
+      </div>
+      <button class="btn btn-orange btn-full btn-lg" onclick="doForgot()">
+        <span data-t="send_otp">Send OTP</span>
+      </button>
+      <div class="auth-footer" style="margin-top:14px">
+        <a href="#" onclick="showLogin()" data-t="back_to_login">← Back to Login</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====================== APP ====================== -->
+<div id="app">
+  <div id="sb-overlay" onclick="toggleSB(false)"></div>
+
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-brand-icon">🌾</div>
+      <div class="sb-brand-text">
+        <h2 data-t="app_name">AnnaSahay</h2>
+        <p data-t="app_tagline">School Grain & Meal Register System</p>
+      </div>
+    </div>
+    <div class="sb-sec">
+      <div class="sb-sec-label" data-t="nav_main">Main</div>
+      <div class="nav-link active" onclick="nav('dashboard')">
+        <span class="ni">📊</span><span data-t="nav_dashboard">Dashboard</span>
+      </div>
+    </div>
+    <div class="sb-sec">
+      <div class="sb-sec-label" data-t="nav_data">Data Entry</div>
+      <div class="nav-link" onclick="nav('daily')">
+        <span class="ni">📋</span><span data-t="nav_daily">Daily Register</span>
+      </div>
+      <div class="nav-link" onclick="nav('stock')">
+        <span class="ni">📦</span><span data-t="nav_stock">Stock Management</span>
+        <span class="nbadge">2</span>
+      </div>
+    </div>
+    <div class="sb-sec">
+      <div class="sb-sec-label" data-t="nav_reports">Reports</div>
+      <div class="nav-link" onclick="nav('monthly')">
+        <span class="ni">📅</span><span data-t="nav_monthly">Monthly Summary</span>
+      </div>
+      <div class="nav-link" onclick="nav('print')">
+        <span class="ni">🖨️</span><span data-t="nav_print">Print Register</span>
+      </div>
+    </div>
+    <div class="sb-sec">
+      <div class="sb-sec-label" data-t="nav_system">System</div>
+      <div class="nav-link" onclick="nav('settings')">
+        <span class="ni">⚙️</span><span data-t="nav_settings">Settings</span>
+      </div>
+      <div class="nav-link" onclick="openModal('m-logout')">
+        <span class="ni">🚪</span><span data-t="nav_logout">Logout</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HEADER -->
+  <header id="header">
+    <button class="hdr-toggle" onclick="toggleSB(true)">☰</button>
+    <div class="hdr-school">
+      <h3 data-t="school_name">Govt. Primary School, Nashik No.5</h3>
+      <p data-t="school_info">Block: Nashik | Dist: Nashik | Maharashtra</p>
+    </div>
+    <div class="hdr-actions">
+      <div class="lang-bar">
+        <button class="active" onclick="setLang('en')">EN</button>
+        <button onclick="setLang('hi')">हि</button>
+        <button onclick="setLang('mr')">म</button>
+      </div>
+      <button class="bell-btn" onclick="nav('dashboard')">🔔<span class="bell-dot"></span></button>
+      <div class="user-chip" onclick="openModal('m-logout')">
+        <div class="user-av" id="user-av">P</div>
+        <span class="user-nm" id="user-nm">Principal</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main id="content">
+
+    <!-- ====== DASHBOARD ====== -->
+    <div class="pg active" id="pg-dashboard">
+      <div class="pg-head">
+        <div class="pg-head-left">
+          <div class="breadcrumb"><span data-t="dashboard">Dashboard</span></div>
+          <h2>📊 <span data-t="dashboard">Dashboard</span></h2>
+          <p id="dash-date"></p>
+        </div>
+        <div class="pg-head-right no-print">
+          <button class="btn btn-green btn-sm" onclick="nav('daily')"><span data-t="new_entry">+ New Entry</span></button>
+        </div>
+      </div>
+
+      <!-- ALERTS -->
+      <div class="alerts-panel card" style="margin-bottom:18px">
+        <div class="card-head">
+          <div>
+            <h3>⚠️ <span data-t="alerts_title">Alerts & Notifications</span></h3>
+          </div>
+          <span class="pill pill-low">3 <span data-t="alerts_active">Active</span></span>
+        </div>
+        <div id="alerts-container"></div>
+      </div>
+
+      <!-- STAT CARDS -->
+      <div class="stats-row">
+        <div class="sc">
+          <div class="sc-bg-icon">👧</div>
+          <div class="sc-label" data-t="total_students">Total Students</div>
+          <div class="sc-val">342</div>
+          <div class="sc-sub"><span class="pill pill-ok" data-t="class_info">Class 1–8</span></div>
+        </div>
+        <div class="sc orange">
+          <div class="sc-bg-icon">✅</div>
+          <div class="sc-label" data-t="todays_attendance">Today's Attendance</div>
+          <div class="sc-val">287</div>
+          <div class="sc-sub">83.9% <span data-t="attendance_pct">attendance</span> <span class="pill pill-ok" data-t="normal">Normal</span></div>
+        </div>
+        <div class="sc brown">
+          <div class="sc-bg-icon">📦</div>
+          <div class="sc-label" data-t="stock_items">Stock Items</div>
+          <div class="sc-val">8</div>
+          <div class="sc-sub"><span class="pill pill-warn">2 <span data-t="low_stock">Low Stock</span></span></div>
+        </div>
+        <div class="sc red">
+          <div class="sc-bg-icon">📉</div>
+          <div class="sc-label" data-t="days_remaining">Est. Days Remaining</div>
+          <div class="sc-val">6</div>
+          <div class="sc-sub"><span data-t="based_rice">Based on rice stock</span> <span class="pill pill-low" data-t="critical">Critical</span></div>
+        </div>
+        <div class="sc gold">
+          <div class="sc-bg-icon">💰</div>
+          <div class="sc-label" data-t="budget_used">Budget Used</div>
+          <div class="sc-val">₹18,420</div>
+          <div class="sc-sub"><span data-t="of_budget">of ₹22,000</span> <span class="pill pill-warn">83%</span></div>
+        </div>
+      </div>
+
+      <!-- EFFICIENCY -->
+      <div class="eff-row">
+        <div class="eff-lbl">📈 <span data-t="fin_efficiency">Financial Efficiency</span></div>
+        <div class="eff-track"><div class="eff-fill" style="width:78%"></div></div>
+        <div class="eff-pill" style="background:var(--yellow-100);color:#7a5800">⚠ Warning – 78%</div>
+      </div>
+
+      <!-- CHARTS -->
+      <div class="charts-row">
+        <div class="chart-box">
+          <h3 data-t="monthly_chart">Monthly Grain Consumption (kg)</h3>
+          <canvas id="c-consume"></canvas>
+        </div>
+        <div class="chart-box">
+          <h3 data-t="attend_chart">Attendance vs Meal Usage</h3>
+          <canvas id="c-attend"></canvas>
+        </div>
+      </div>
+
+      <!-- QUICK STOCK -->
+      <div class="card">
+        <div class="card-head">
+          <h3>📦 <span data-t="quick_stock">Quick Stock Summary</span></h3>
+          <button class="btn btn-outline btn-sm" onclick="nav('stock')"><span data-t="view_all">View All →</span></button>
+        </div>
+        <div class="card-body">
+          <div class="tbl-wrap">
+            <table id="dash-stock-table">
+              <thead>
+                <tr>
+                  <th data-t="item">Item</th>
+                  <th data-t="opening">Opening</th>
+                  <th data-t="received">Received</th>
+                  <th data-t="used">Used</th>
+                  <th data-t="balance">Balance</th>
+                  <th data-t="status">Status</th>
+                </tr>
+              </thead>
+              <tbody id="dash-stock-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== STOCK ====== -->
+    <div class="pg" id="pg-stock">
+      <div class="pg-head">
+        <div class="pg-head-left">
+          <div class="breadcrumb"><span data-t="nav_stock">Stock Management</span></div>
+          <h2>📦 <span data-t="stock_mgmt">Stock Management</span></h2>
+          <p data-t="stock_sub">Track grain and ingredient inventory</p>
+        </div>
+        <div class="pg-head-right no-print">
+          <button class="btn btn-green btn-sm" onclick="toggleStockForm(true)"><span data-t="add_stock">+ Add Stock</span></button>
+        </div>
+      </div>
+
+      <!-- ADD STOCK FORM -->
+      <div class="card" id="stock-form-card" style="display:none;margin-bottom:18px">
+        <div class="card-head">
+          <h3>➕ <span data-t="add_stock_title">Add New Stock Entry</span></h3>
+          <button class="btn btn-gray btn-sm" onclick="toggleStockForm(false)"><span data-t="close">✕ Close</span></button>
+        </div>
+        <div class="card-body">
+          <div class="fgrid">
+            <div class="fgrp">
+              <label data-t="item_name">Item Name</label>
+              <select id="stock-item" onchange="chkCustom(this)">
+                <option value="" data-t="select_item">-- Select Item --</option>
+                <option>Rice</option><option>Wheat</option><option>Dal (Toor)</option>
+                <option>Dal (Moong)</option><option>Oil (Sunflower)</option>
+                <option>Salt</option><option>Sugar</option><option>Spices Mix</option>
+                <option value="custom">+ Add Custom Item</option>
+              </select>
+            </div>
+            <div class="fgrp" id="custom-item-grp" style="display:none">
+              <label data-t="custom_item">Custom Item Name</label>
+              <input type="text" data-t="custom_item_ph" data-t-attr="placeholder" placeholder="Enter item name"/>
+            </div>
+            <div class="fgrp">
+              <label data-t="quantity">Quantity</label>
+              <input type="number" id="stk-qty" data-t="qty_ph" data-t-attr="placeholder" placeholder="e.g. 50" min="0" step="0.1" oninput="calcTotal()"/>
+            </div>
+            <div class="fgrp">
+              <label data-t="unit">Unit</label>
+              <select>
+                <option>kg</option><option>gram</option><option>litre</option>
+                <option>ml</option><option>piece</option><option>packet</option><option>quintal</option>
+              </select>
+            </div>
+            <div class="fgrp">
+              <label data-t="cost_per_unit">Cost per Unit (₹)</label>
+              <input type="number" id="stk-cpu" data-t="cost_ph" data-t-attr="placeholder" placeholder="e.g. 38" min="0" step="0.01" oninput="calcTotal()"/>
+            </div>
+            <div class="fgrp">
+              <label data-t="total_cost">Total Cost (₹)</label>
+              <input type="number" id="stk-total" placeholder="" readonly style="background:var(--gray-100)"/>
+            </div>
+            <div class="fgrp">
+              <label data-t="supplier">Supplier Name</label>
+              <input type="text" data-t="supplier_ph" data-t-attr="placeholder" placeholder="e.g. Ramesh Traders"/>
+            </div>
+            <div class="fgrp">
+              <label data-t="date_received">Date Received</label>
+              <input type="date" id="stk-date"/>
+            </div>
+            <div class="fgrp full">
+              <label data-t="upload_invoice">Upload Invoice</label>
+              <div class="file-zone" onclick="this.querySelector('input').click()">
+                <span class="fzi">📄</span>
+                <span data-t="click_upload_inv">Click to upload invoice (PDF/Image)</span>
+                <input type="file" accept=".pdf,.jpg,.png" style="display:none"/>
+              </div>
+            </div>
+            <div class="fgrp full">
+              <label data-t="upload_photo">Upload Delivery Photo</label>
+              <div class="file-zone" onclick="this.querySelector('input').click()">
+                <span class="fzi">📷</span>
+                <span data-t="click_upload_ph">Click to upload delivery photo</span>
+                <input type="file" accept="image/*" style="display:none"/>
+              </div>
+            </div>
+          </div>
+          <div class="faction">
+            <button class="btn btn-green" onclick="saveStock()"><span data-t="save_stock">💾 Save Stock Entry</span></button>
+            <button class="btn btn-gray" onclick="toggleStockForm(false)"><span data-t="cancel">Cancel</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STOCK TABLE -->
+      <div class="card">
+        <div class="card-head">
+          <h3>📋 <span data-t="current_inventory">Current Stock Inventory</span></h3>
+          <span class="pill pill-warn">2 <span data-t="items_low">Items Low</span></span>
+        </div>
+        <div class="card-body">
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th data-t="item">Item</th>
+                  <th data-t="unit_label">Unit</th>
+                  <th data-t="opening">Opening</th>
+                  <th data-t="total_received">Total Received</th>
+                  <th data-t="total_used">Total Used</th>
+                  <th data-t="wastage">Wastage</th>
+                  <th data-t="current_balance">Current Balance</th>
+                  <th data-t="status">Status</th>
+                  <th data-t="last_updated">Last Updated</th>
+                </tr>
+              </thead>
+              <tbody id="stock-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== DAILY REGISTER ====== -->
+    <div class="pg" id="pg-daily">
+      <div class="pg-head">
+        <div class="pg-head-left">
+          <div class="breadcrumb"><span data-t="nav_daily">Daily Register</span></div>
+          <h2>📋 <span data-t="daily_register">Daily Meal Register</span></h2>
+          <p data-t="daily_sub">Record daily meal distribution</p>
+        </div>
+        <div class="pg-head-right no-print">
+          <button class="btn btn-green btn-sm" onclick="openModal('m-daily')"><span data-t="save_entry">💾 Save Entry</span></button>
+        </div>
+      </div>
+
+      <!-- DAILY FORM -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-head">
+          <h3>📝 <span data-t="today_form">Today's Entry Form</span></h3>
+        </div>
+        <div class="card-body">
+          <div class="fgrid">
+            <div class="fgrp">
+              <label data-t="date_label">Date</label>
+              <input type="date" id="daily-date"/>
+            </div>
+            <div class="fgrp">
+              <label data-t="students_present">Students Present</label>
+              <input type="number" id="daily-stu" data-t="students_ph" data-t-attr="placeholder" placeholder="e.g. 287" min="0"/>
+            </div>
+            <div class="fgrp">
+              <label data-t="meal_type">Meal Type</label>
+              <select id="daily-meal">
+                <option data-t="select_meal">-- Select Meal --</option>
+                <option data-t="meal_lunch">Lunch (Standard)</option>
+                <option data-t="meal_festival">Lunch (Festival Special)</option>
+                <option data-t="meal_both">Breakfast + Lunch</option>
+                <option data-t="meal_holiday">No Meal (Holiday)</option>
+              </select>
+            </div>
+            <div class="fgrp">
+              <label data-t="menu_desc">Menu Description</label>
+              <input type="text" data-t="menu_ph" data-t-attr="placeholder" placeholder="e.g. Rice, Dal, Sabji"/>
+            </div>
+            <div class="fgrp full">
+              <div class="fsec" data-t="item_consumption">Item-wise Consumption</div>
+              <div id="daily-items" style="margin-top:10px"></div>
+            </div>
+            <div class="fgrp">
+              <label data-t="remarks">Remarks / Notes</label>
+              <textarea rows="2" data-t="remarks_ph" data-t-attr="placeholder" placeholder="Observations..."></textarea>
+            </div>
+            <div class="fgrp">
+              <label data-t="cooked_by">Cooked By</label>
+              <input type="text" data-t="cook_ph" data-t-attr="placeholder" value="Sunita Devi" placeholder="Name of cook"/>
+            </div>
+          </div>
+          <div class="faction">
+            <button class="btn btn-green" onclick="openModal('m-daily')"><span data-t="save_btn">💾 Save Entry</span></button>
+            <button class="btn btn-gray" onclick="resetDaily()"><span data-t="reset">Reset</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MONTHLY DAILY TABLE -->
+      <div class="card">
+        <div class="card-head">
+          <h3>📅 <span data-t="feb_register">February 2026 – Daily Register</span></h3>
+          <button class="btn btn-outline btn-sm no-print" onclick="nav('print')"><span data-t="print_btn">🖨️ Print</span></button>
+        </div>
+        <div class="card-body">
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th data-t="date_label">Date</th>
+                  <th data-t="day">Day</th>
+                  <th data-t="present">Present</th>
+                  <th data-t="meal_type">Meal Type</th>
+                  <th data-t="rice">Rice (kg)</th>
+                  <th data-t="wheat">Wheat (kg)</th>
+                  <th data-t="dal">Dal (kg)</th>
+                  <th data-t="oil">Oil (L)</th>
+                  <th data-t="salt">Salt (kg)</th>
+                  <th data-t="remarks">Remarks</th>
+                </tr>
+              </thead>
+              <tbody id="daily-tbody"></tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2"><strong data-t="total_row">TOTAL</strong></td>
+                  <td><strong>3,737</strong></td>
+                  <td>—</td>
+                  <td><strong>112.8</strong></td>
+                  <td><strong>75.2</strong></td>
+                  <td><strong>37.4</strong></td>
+                  <td><strong>12.6</strong></td>
+                  <td><strong>3.7</strong></td>
+                  <td>—</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== MONTHLY SUMMARY ====== -->
+    <div class="pg" id="pg-monthly">
+      <div class="pg-head">
+        <div class="pg-head-left">
+          <div class="breadcrumb"><span data-t="nav_monthly">Monthly Summary</span></div>
+          <h2>📅 <span data-t="monthly_summary">Monthly Summary</span></h2>
+          <p data-t="monthly_sub">Consolidated view for February 2026</p>
+        </div>
+        <div class="pg-head-right no-print">
+          <select class="btn btn-outline btn-sm" style="background:white">
+            <option>February 2026</option>
+            <option>January 2026</option>
+            <option>December 2025</option>
+          </select>
+          <button class="btn btn-green btn-sm" onclick="nav('print')"><span data-t="print_btn">🖨️ Print</span></button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-head">
+          <h3>📦 <span data-t="stock_summary">Stock Summary (Item-wise)</span></h3>
+        </div>
+        <div class="card-body">
+          <div class="tbl-wrap">
+            <table id="monthly-table">
+              <thead>
+                <tr>
+                  <th data-t="item">Item</th>
+                  <th data-t="opening_stock">Opening Stock</th>
+                  <th data-t="total_received">Total Received</th>
+                  <th data-t="total_used">Total Used</th>
+                  <th data-t="wastage">Wastage</th>
+                  <th data-t="closing_stock">Closing Stock</th>
+                  <th data-t="efficiency">Efficiency</th>
+                </tr>
+              </thead>
+              <tbody id="monthly-tbody"></tbody>
+              <tfoot>
+                <tr>
+                  <td><strong data-t="total_row">TOTAL</strong></td>
+                  <td>185</td><td>121</td><td>239</td><td>2.2</td><td>64.8</td>
+                  <td><span class="pill pill-ok" data-t="normal">Normal</span></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINANCIAL SUMMARY -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-head">
+          <h3>💰 <span data-t="fin_summary">Financial Summary</span></h3>
+        </div>
+        <div class="card-body">
+          <div class="stats-row" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+            <div class="sc"><div class="sc-label" data-t="allocated">Budget Allocated</div><div class="sc-val" style="font-size:1.4rem">₹22,000</div></div>
+            <div class="sc orange"><div class="sc-label" data-t="spent">Amount Spent</div><div class="sc-val" style="font-size:1.4rem">₹18,420</div></div>
+            <div class="sc"><div class="sc-label" data-t="remaining">Remaining</div><div class="sc-val" style="font-size:1.4rem">₹3,580</div></div>
+            <div class="sc"><div class="sc-label" data-t="avg_cost">Avg. Cost / Student / Day</div><div class="sc-val" style="font-size:1.4rem">₹6.41</div></div>
+            <div class="sc"><div class="sc-label" data-t="meals_served">Total Meals Served</div><div class="sc-val" style="font-size:1.4rem">3,737</div></div>
+          </div>
+          <div class="eff-row" style="margin-bottom:0">
+            <div class="eff-lbl" data-t="budget_util">Budget Utilization</div>
+            <div class="eff-track"><div class="eff-fill" style="width:83.7%"></div></div>
+            <div class="eff-pill" style="background:var(--yellow-100);color:#7a5800">⚠ Warning – 83.7%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-box">
+          <h3 data-t="week_grain">Week-wise Grain Usage (kg)</h3>
+          <canvas id="c-grain"></canvas>
+        </div>
+        <div class="chart-box">
+          <h3 data-t="item_pie">Item-wise Consumption Share</h3>
+          <canvas id="c-pie"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== PRINT ====== -->
+    <div class="pg" id="pg-print">
+      <div class="pg-head no-print">
+        <div class="pg-head-left">
+          <div class="breadcrumb"><span data-t="nav_print">Print Register</span></div>
+          <h2>🖨️ <span data-t="print_register">Print Register</span></h2>
+          <p data-t="print_sub">A4 layout – ready for official submission</p>
+        </div>
+        <div class="pg-head-right">
+          <button class="btn btn-green btn-sm" onclick="window.print()"><span data-t="print_action">🖨️ Print</span></button>
+          <button class="btn btn-orange btn-sm" onclick="showToast(t('pdf_notice'))"><span data-t="download_pdf">⬇ Download PDF</span></button>
+        </div>
+      </div>
+
+      <div id="print-page-content" style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius);padding:24px">
+        <div style="text-align:center;border-bottom:2px solid var(--green-800);padding-bottom:14px;margin-bottom:18px">
+          <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:10px">
+            <div style="font-size:2.8rem">🌾</div>
+            <div>
+              <h1 id="pr-school-name" style="font-size:1.15rem;font-weight:800">Govt. Primary School, Nashik No.5</h1>
+              <p id="pr-school-info" style="font-size:0.78rem;color:var(--gray-500)">Block: Nashik | Dist: Nashik | Maharashtra</p>
+            </div>
+            <div style="font-size:2.8rem">⚖️</div>
+          </div>
+          <div style="background:var(--green-700);color:white;padding:6px 22px;display:inline-block;border-radius:4px;font-size:0.82rem;font-weight:800;letter-spacing:0.8px">
+            <span id="pr-ministry"></span>
+          </div>
+          <p style="margin-top:8px;font-size:0.82rem"><strong id="pr-month-label"></strong> &nbsp;|&nbsp; <strong>Academic Year:</strong> 2025-26 &nbsp;|&nbsp; <strong>UDISE:</strong> 27110102601</p>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;font-size:0.8rem">
+          <table style="font-size:0.78rem">
+            <thead><tr><th colspan="2" id="pr-school-det"></th></tr></thead>
+            <tbody>
+              <tr><td><strong id="pr-total-enrolled-lbl"></strong></td><td>342 <span id="pr-students-lbl"></span></td></tr>
+              <tr><td><strong id="pr-school-type-lbl"></strong></td><td id="pr-school-type-val"></td></tr>
+              <tr><td><strong id="pr-hm-lbl"></strong></td><td>Shri. Raju Patil</td></tr>
+              <tr><td><strong id="pr-cook-lbl"></strong></td><td>Smt. Sunita Devi</td></tr>
+            </tbody>
+          </table>
+          <table style="font-size:0.78rem">
+            <thead><tr><th colspan="2" id="pr-mon-sum-lbl"></th></tr></thead>
+            <tbody>
+              <tr><td><strong id="pr-wdays-lbl"></strong></td><td>20 <span id="pr-days-lbl"></span></td></tr>
+              <tr><td><strong id="pr-total-fed-lbl"></strong></td><td>3,737</td></tr>
+              <tr><td><strong id="pr-budget-lbl"></strong></td><td>₹18,420 / ₹22,000</td></tr>
+              <tr><td><strong id="pr-gen-lbl"></strong></td><td id="pr-gen-date"></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4 id="pr-daily-hdr" style="font-size:0.88rem;font-weight:800;margin-bottom:8px;background:var(--green-50);padding:6px 10px;border-left:4px solid var(--green-600)"></h4>
+        <div class="tbl-wrap">
+          <table style="font-size:0.73rem">
+            <thead>
+              <tr>
+                <th id="pr-date-lbl"></th>
+                <th id="pr-day-lbl"></th>
+                <th id="pr-pres-lbl"></th>
+                <th id="pr-meal-lbl"></th>
+                <th id="pr-rice-lbl"></th>
+                <th id="pr-wheat-lbl"></th>
+                <th id="pr-dal-lbl"></th>
+                <th id="pr-oil-lbl"></th>
+                <th id="pr-salt-lbl"></th>
+                <th id="pr-rem-lbl"></th>
+              </tr>
+            </thead>
+            <tbody id="print-tbody"></tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"><strong id="pr-total-lbl"></strong></td>
+                <td>3,737</td><td>—</td>
+                <td>112.8</td><td>75.2</td><td>37.4</td><td>12.6</td><td>3.7</td><td>—</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <h4 id="pr-stock-hdr" style="font-size:0.88rem;font-weight:800;margin:16px 0 8px;background:var(--green-50);padding:6px 10px;border-left:4px solid var(--green-600)"></h4>
+        <table style="font-size:0.76rem">
+          <thead>
+            <tr>
+              <th id="pr-s-item"></th>
+              <th id="pr-s-open"></th>
+              <th id="pr-s-recv"></th>
+              <th id="pr-s-used"></th>
+              <th id="pr-s-wast"></th>
+              <th id="pr-s-clos"></th>
+            </tr>
+          </thead>
+          <tbody id="print-stock-tbody"></tbody>
+        </table>
+
+        <div style="display:flex;justify-content:space-between;margin-top:36px;gap:10px">
+          <div style="text-align:center;border-top:1px solid #333;padding-top:6px;flex:1">
+            <p style="font-size:0.75rem;font-weight:700" id="pr-sig-cook"></p>
+            <p style="font-size:0.7rem;color:var(--gray-500)">Smt. Sunita Devi</p>
+          </div>
+          <div style="text-align:center;border-top:1px solid #333;padding-top:6px;flex:1">
+            <p style="font-size:0.75rem;font-weight:700" id="pr-sig-teacher"></p>
+          </div>
+          <div style="text-align:center;border-top:1px solid #333;padding-top:6px;flex:1">
+            <p style="font-size:0.75rem;font-weight:700" id="pr-sig-hm"></p>
+            <p style="font-size:0.7rem;color:var(--gray-500)">Shri. Raju Patil</p>
+          </div>
+          <div style="text-align:center;border-top:1px solid #333;padding-top:6px;flex:1">
+            <p style="font-size:0.75rem;font-weight:700" id="pr-sig-beo"></p>
+          </div>
+        </div>
+        <div style="text-align:center;font-size:0.68rem;color:var(--gray-400);margin-top:14px;border-top:var(--border);padding-top:8px" id="pr-footer"></div>
+      </div>
+    </div>
+
+    <!-- ====== SETTINGS ====== -->
+    <div class="pg" id="pg-settings">
+      <div class="pg-head">
+        <div class="pg-head-left">
+          <div class="breadcrumb"><span data-t="nav_settings">Settings</span></div>
+          <h2>⚙️ <span data-t="settings">Settings</span></h2>
+          <p data-t="settings_sub">Configure school and system preferences</p>
+        </div>
+        <div class="pg-head-right no-print">
+          <button class="btn btn-green btn-sm" onclick="showToast(t('settings_saved'))"><span data-t="save_changes">💾 Save Changes</span></button>
+        </div>
+      </div>
+      <div class="set-grid">
+        <div class="card">
+          <div class="card-head"><h3>🏫 <span data-t="school_info_sec">School Information</span></h3></div>
+          <div class="card-body">
+            <div class="fgrp"><label data-t="school_name_lbl">School Name</label><input type="text" value="Govt. Primary School, Nashik No.5"/></div>
+            <div class="fgrp"><label data-t="udise_code">UDISE Code</label><input type="text" value="27110102601"/></div>
+            <div class="fgrp"><label data-t="block_taluka">Block / Taluka</label><input type="text" value="Nashik"/></div>
+            <div class="fgrp"><label data-t="district">District</label><input type="text" value="Nashik"/></div>
+            <div class="fgrp"><label data-t="state">State</label>
+              <select><option selected>Maharashtra</option><option>Gujarat</option><option>Rajasthan</option></select>
+            </div>
+            <div class="fgrp"><label data-t="students_enrolled">Total Students Enrolled</label><input type="number" value="342"/></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>👤 <span data-t="user_account">User Account</span></h3></div>
+          <div class="card-body">
+            <div class="fgrp"><label data-t="hm_name">Headmaster Name</label><input type="text" value="Shri. Raju Patil"/></div>
+            <div class="fgrp"><label data-t="mobile_no">Mobile Number</label><input type="tel" value="9876543210"/></div>
+            <div class="fgrp"><label data-t="email_id">Email ID</label><input type="email" value="hm.nashik5@gov.in"/></div>
+            <div class="fgrp"><label data-t="cook_name">Cook's Name</label><input type="text" value="Smt. Sunita Devi"/></div>
+            <div class="fgrp"><label data-t="change_pass">Change Password</label><input type="password" data-t="new_pass" data-t-attr="placeholder" placeholder="New password"/></div>
+            <div class="fgrp"><label>&nbsp;</label><input type="password" data-t="confirm_pass" data-t-attr="placeholder" placeholder="Confirm new password"/></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>🔧 <span data-t="sys_pref">System Preferences</span></h3></div>
+          <div class="card-body">
+            <div class="set-row">
+              <div class="set-row-lbl"><strong data-t="low_stock_alert">Low Stock Alert</strong><small data-t="low_stock_desc">Alert when stock falls below threshold</small></div>
+              <label class="tog"><input type="checkbox" checked/><span class="tog-sl"></span></label>
+            </div>
+            <div class="set-row">
+              <div class="set-row-lbl"><strong data-t="daily_reminder">Daily Reminder</strong><small data-t="daily_reminder_desc">Remind to enter data at 12 PM</small></div>
+              <label class="tog"><input type="checkbox" checked/><span class="tog-sl"></span></label>
+            </div>
+            <div class="set-row">
+              <div class="set-row-lbl"><strong data-t="auto_calc">Auto-calculate Quantities</strong><small data-t="auto_calc_desc">Based on students present</small></div>
+              <label class="tog"><input type="checkbox" checked/><span class="tog-sl"></span></label>
+            </div>
+            <div class="set-row">
+              <div class="set-row-lbl"><strong data-t="show_wastage">Show Wastage Column</strong></div>
+              <label class="tog"><input type="checkbox"/><span class="tog-sl"></span></label>
+            </div>
+            <div class="fgrp" style="margin-top:12px">
+              <label data-t="default_lang">Default Language</label>
+              <select onchange="setLang(this.value.substring(0,2).toLowerCase())">
+                <option value="en">English</option>
+                <option value="hi">हिंदी (Hindi)</option>
+                <option value="mr">मराठी (Marathi)</option>
+              </select>
+            </div>
+            <div class="fgrp"><label data-t="threshold_days">Low Stock Threshold (days)</label><input type="number" value="7" min="1"/></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>💰 <span data-t="budget_config">Budget Configuration</span></h3></div>
+          <div class="card-body">
+            <div class="fgrp"><label data-t="monthly_budget">Monthly Budget (₹)</label><input type="number" value="22000"/></div>
+            <div class="fgrp"><label data-t="per_student_rate">Per Student Per Day (₹)</label><input type="number" value="6.50" step="0.01"/></div>
+            <div class="fgrp"><label data-t="state_grant">State Grant (₹)</label><input type="number" value="15000"/></div>
+            <div class="fgrp"><label data-t="central_grant">Central Grant (₹)</label><input type="number" value="7000"/></div>
+            <div class="set-row">
+              <div class="set-row-lbl"><strong data-t="budget_warn">Budget Warning Alert</strong><small data-t="budget_warn_desc">Alert when 80% budget is used</small></div>
+              <label class="tog"><input type="checkbox" checked/><span class="tog-sl"></span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ====== MODALS ====== -->
+<div class="modal-bg" id="m-logout">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <h3>🚪 <span data-t="confirm_logout">Confirm Logout</span></h3>
+      <button class="modal-close" onclick="closeModal('m-logout')">✕</button>
+    </div>
+    <div class="modal-bd" data-t="logout_msg">Are you sure you want to log out?</div>
+    <div class="modal-ft">
+      <button class="btn btn-gray" onclick="closeModal('m-logout')"><span data-t="cancel">Cancel</span></button>
+      <button class="btn btn-red" onclick="doLogout()"><span data-t="yes_logout">Yes, Logout</span></button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="m-daily">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <h3>💾 <span data-t="confirm_entry">Confirm Daily Entry</span></h3>
+      <button class="modal-close" onclick="closeModal('m-daily')">✕</button>
+    </div>
+    <div class="modal-bd" data-t="confirm_entry_msg">Save today's register?</div>
+    <div class="modal-ft">
+      <button class="btn btn-gray" onclick="closeModal('m-daily')"><span data-t="cancel">Cancel</span></button>
+      <button class="btn btn-green" onclick="saveDailyEntry()"><span data-t="confirm_save">✅ Confirm Save</span></button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ===== AUTH =====
+function selectRole(el, role) {
+  document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  currentRole = role;
+}
+function showForgot() {
+  document.getElementById('login-card').style.display='none';
+  document.getElementById('forgot-card').style.display='block';
+}
+function showLogin() {
+  document.getElementById('forgot-card').style.display='none';
+  document.getElementById('login-card').style.display='block';
+}
+function doLogin() {
+  const u = document.getElementById('l-user').value.trim();
+  const p = document.getElementById('l-pass').value.trim();
+  let ok = true;
+  const eu = document.getElementById('err-user'), ep = document.getElementById('err-pass');
+  eu.classList.remove('show'); ep.classList.remove('show');
+  document.getElementById('l-user').classList.remove('err-field');
+  document.getElementById('l-pass').classList.remove('err-field');
+  if (!u) { eu.classList.add('show'); document.getElementById('l-user').classList.add('err-field'); ok=false; }
+  if (!p) { ep.classList.add('show'); document.getElementById('l-pass').classList.add('err-field'); ok=false; }
+  else if (p.length<4) {
+    ep.textContent = t('val_pass_short'); ep.classList.add('show');
+    document.getElementById('l-pass').classList.add('err-field'); ok=false;
+  }
+  if (!ok) return;
+  // Mock login success
+  document.getElementById('auth-wrapper').style.display='none';
+  document.getElementById('app').classList.add('show');
+  document.getElementById('user-av').textContent = currentRole[0].toUpperCase();
+  document.getElementById('user-nm').textContent = t('role_' + currentRole.toLowerCase()) || currentRole;
+  initApp();
+}
+function doForgot() {
+  const fid = document.getElementById('f-id').value.trim();
+  const ef = document.getElementById('err-fid');
+  ef.classList.remove('show');
+  if (!fid) { ef.classList.add('show'); return; }
+  showToast(t('otp_sent'));
+  setTimeout(showLogin, 1600);
+}
+function doLogout() {
+  closeModal('m-logout');
+  document.getElementById('app').classList.remove('show');
+  document.getElementById('auth-wrapper').style.display='flex';
+  document.getElementById('l-user').value='';
+  document.getElementById('l-pass').value='';
+}
+
+// ===== NAVIGATION =====
+function nav(page) {
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+  const pg = document.getElementById('pg-'+page);
+  if (pg) pg.classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l=>{
+    if (l.getAttribute('onclick') && l.getAttribute('onclick').includes("'"+page+"'")) l.classList.add('active');
+  });
+  toggleSB(false);
+  if (page==='dashboard') initDashboard();
+  if (page==='stock') renderStockTable();
+  if (page==='daily') { renderDailyTable(); buildItemChecklist(); }
+  if (page==='monthly') initMonthly();
+  if (page==='print') renderPrint();
+  window.scrollTo(0,0);
+}
+
+function toggleSB(open) {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sb-overlay');
+  sb.classList.toggle('open', open);
+  ov.classList.toggle('visible', open);
+}
+
+// ===== MODALS =====
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ document.querySelectorAll('.modal-bg.open').forEach(m=>m.classList.remove('open')); toggleSB(false); }});
+
+// ===== TOAST =====
+function showToast(msg, ms=3200) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(el._t); el._t = setTimeout(()=>el.classList.remove('show'),ms);
+}
+
+// ===== INIT APP =====
+function initApp() {
+  const now = new Date();
+  const dd = document.getElementById('dash-date');
+  if (dd) dd.textContent = now.toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const dp = document.getElementById('daily-date');
+  if (dp) dp.value = now.toISOString().split('T')[0];
+  const stk = document.getElementById('stk-date');
+  if (stk) stk.value = now.toISOString().split('T')[0];
+  applyLang();
+  initDashboard();
+}
+
+// ===== DASHBOARD =====
+function initDashboard() {
+  renderDashStock();
+  updateAlerts();
+  buildConsumptionChart();
+  buildAttendanceChart();
+}
+
+function renderDashStock() {
+  const tbody = document.getElementById('dash-stock-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  const items = ITEM_NAMES[lang];
+  const units = ITEM_UNITS;
+  const show = STOCK_DATA.slice(0,5);
+  show.forEach((s,i)=>{
+    const bal = +(s.opening + s.received - s.used - s.wastage).toFixed(1);
+    const pct = (bal/(s.opening+s.received))*100;
+    const cls = pct<20?'st-low':pct<40?'st-warn':'st-ok';
+    const stLbl = pct<20?t('critical'):pct<40?t('low'):t('adequate');
+    tbody.innerHTML += `<tr>
+      <td>${items[i]}</td>
+      <td>${s.opening} ${units[i]}</td>
+      <td>${s.received} ${units[i]}</td>
+      <td>${s.used} ${units[i]}</td>
+      <td><strong>${bal} ${units[i]}</strong></td>
+      <td><span class="${cls}">${stLbl}</span></td>
+    </tr>`;
+  });
+}
+
+function buildConsumptionChart() {
+  const ctx = document.getElementById('c-consume');
+  if (!ctx) return;
+  if (charts.consumption) charts.consumption.destroy();
+  const items = ITEM_NAMES[lang];
+  charts.consumption = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels:['Sep','Oct','Nov','Dec','Jan','Feb'],
+      datasets:[
+        {label:items[0],data:[98,105,112,95,108,112],backgroundColor:'#3a7d5c'},
+        {label:items[1],data:[65,70,72,60,72,75],backgroundColor:'#e07b39'},
+        {label:items[2],data:[32,35,38,30,36,37],backgroundColor:'#6b3a2a'},
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}},title:{display:false}},
+      scales:{x:{ticks:{font:{size:10}}},y:{ticks:{font:{size:10}}}}
+    }
+  });
+}
+
+function buildAttendanceChart() {
+  const ctx = document.getElementById('c-attend');
+  if (!ctx) return;
+  if (charts.attendance) charts.attendance.destroy();
+  const mealLbl = lang==='mr'?'जेवण दिले':lang==='hi'?'भोजन परोसे':'Meals Served';
+  charts.attendance = new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:['Wk1','Wk2','Wk3','Wk4'],
+      datasets:[
+        {label:t('todays_attendance'),data:[1234,1452,1351,1420],borderColor:'#2d6a4f',backgroundColor:'rgba(45,106,79,0.12)',fill:true,tension:0.35},
+        {label:mealLbl,data:[1200,1430,1320,1400],borderColor:'#e07b39',backgroundColor:'rgba(224,123,57,0.1)',fill:true,tension:0.35},
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}},
+      scales:{x:{ticks:{font:{size:10}}},y:{ticks:{font:{size:10}}}}
+    }
+  });
+}
+
+// ===== STOCK =====
+function renderStockTable() {
+  const tbody = document.getElementById('stock-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  const items = ITEM_NAMES[lang];
+  const units = ITEM_UNITS;
+  const today = new Date().toLocaleDateString('en-IN');
+  STOCK_DATA.forEach((s,i)=>{
+    const bal = +(s.opening+s.received-s.used-s.wastage).toFixed(1);
+    const pct = Math.max(0,Math.min(100,(bal/(s.opening+s.received))*100));
+    const stClass = pct<20?'st-low':pct<40?'st-warn':'st-ok';
+    const stLbl = pct<20?t('critical'):pct<40?t('low'):t('adequate');
+    const barClr = pct<20?'#dc3545':pct<40?'#f0ac00':'#40916c';
+    tbody.innerHTML+=`<tr>
+      <td>${i+1}</td>
+      <td><strong>${items[i]}</strong></td>
+      <td>${units[i]}</td>
+      <td>${s.opening}</td>
+      <td>${s.received}</td>
+      <td>${s.used}</td>
+      <td>${s.wastage}</td>
+      <td><strong>${bal}</strong>
+        <div class="stk-bar"><div class="stk-bar-fill" style="width:${pct}%;background:${barClr}"></div></div>
+      </td>
+      <td><span class="${stClass}">${stLbl}</span></td>
+      <td style="font-size:0.73rem;color:var(--gray-500)">${today}</td>
+    </tr>`;
+  });
+}
+
+function toggleStockForm(show) {
+  document.getElementById('stock-form-card').style.display = show?'block':'none';
+  if (show) document.getElementById('stock-form-card').scrollIntoView({behavior:'smooth'});
+}
+function chkCustom(sel) {
+  document.getElementById('custom-item-grp').style.display = sel.value==='custom'?'block':'none';
+}
+function calcTotal() {
+  const q = parseFloat(document.getElementById('stk-qty').value)||0;
+  const c = parseFloat(document.getElementById('stk-cpu').value)||0;
+  document.getElementById('stk-total').value = (q*c).toFixed(2);
+}
+function saveStock() {
+  toggleStockForm(false);
+  showToast(t('stock_saved'));
+}
+
+// ===== DAILY REGISTER =====
+function buildItemChecklist() {
+  const container = document.getElementById('daily-items');
+  if (!container) return;
+  const items = ITEM_NAMES[lang];
+  container.innerHTML = '';
+  items.forEach((item, i) => {
+    const id = 'dic-'+i;
+    const row = document.createElement('div');
+    row.className = 'item-check-row';
+    row.innerHTML = `
+      <input type="checkbox" id="${id}" onchange="toggleItemQty(this,'diq-${i}')">
+      <label for="${id}">${item}</label>
+      <div class="item-qty-wrap" id="diq-${i}">
+        <input type="number" placeholder="0.0" min="0" step="0.1">
+        <span>${ITEM_UNITS[i]}</span>
+      </div>
+    `;
+    container.appendChild(row);
+  });
+}
+function toggleItemQty(chk, qid) {
+  const el = document.getElementById(qid);
+  if (el) el.classList.toggle('show', chk.checked);
+}
+function resetDaily() {
+  document.querySelectorAll('#daily-items input[type=checkbox]').forEach(c=>{ c.checked=false; });
+  document.querySelectorAll('#daily-items .item-qty-wrap').forEach(w=>w.classList.remove('show'));
+}
+
+function renderDailyTable() {
+  const tbody = document.getElementById('daily-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  const days = lang==='hi'?DAYS_HI:lang==='mr'?DAYS_MR:DAYS_EN;
+  const mealLabel = lang==='mr'?'जेवण':lang==='hi'?'भोजन':'Lunch';
+  DAILY_DATA.forEach((row, i) => {
+    const isHol = row.p === 0;
+    const remText = row.rem==='holiday'?t('holiday'):row.rem==='today_label'?t('today_label'):row.rem==='stock_delivery'?t('stock_delivery'):'';
+    tbody.innerHTML += `<tr style="${isHol?'color:var(--gray-400)':''}">
+      <td><strong>${DATE_LABELS[i]}</strong></td>
+      <td>${days[i]}</td>
+      <td>${isHol?'—':row.p}</td>
+      <td style="font-size:0.75rem">${isHol?t('holiday'):mealLabel}</td>
+      <td>${isHol?'—':row.rice}</td>
+      <td>${isHol?'—':row.wheat}</td>
+      <td>${isHol?'—':row.dal}</td>
+      <td>${isHol?'—':row.oil}</td>
+      <td>${isHol?'—':row.salt}</td>
+      <td style="font-size:0.73rem;color:var(--gray-500)">${remText}</td>
+    </tr>`;
+  });
+}
+
+function saveDailyEntry() {
+  closeModal('m-daily');
+  showToast(t('entry_saved'));
+}
+
+// ===== MONTHLY =====
+function initMonthly() {
+  renderMonthlyTable();
+  buildGrainChart();
+  buildPieChart();
+}
+function renderMonthlyTable() {
+  const tbody = document.getElementById('monthly-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  const items = ITEM_NAMES[lang];
+  const units = ITEM_UNITS;
+  STOCK_DATA.forEach((s,i)=>{
+    const bal = +(s.opening+s.received-s.used-s.wastage).toFixed(1);
+    const pct = (bal/(s.opening+s.received))*100;
+    const stLbl = pct<20?t('critical'):pct<40?t('low'):t('good');
+    const cls = pct<20?'pill-low':pct<40?'pill-warn':'pill-ok';
+    tbody.innerHTML+=`<tr>
+      <td>${items[i]}</td>
+      <td>${s.opening} ${units[i]}</td>
+      <td>${s.received} ${units[i]}</td>
+      <td>${s.used} ${units[i]}</td>
+      <td>${s.wastage} ${units[i]}</td>
+      <td>${bal} ${units[i]}</td>
+      <td><span class="pill ${cls}">${stLbl}</span></td>
+    </tr>`;
+  });
+}
+function buildGrainChart() {
+  const ctx = document.getElementById('c-grain');
+  if (!ctx) return;
+  if (charts.grain) charts.grain.destroy();
+  const items = ITEM_NAMES[lang];
+  charts.grain = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['Wk1','Wk2','Wk3','Wk4'],
+      datasets:[
+        {label:items[0],data:[29.4,31.2,28.8,23.4],backgroundColor:'#3a7d5c'},
+        {label:items[1],data:[18.7,19.8,18.2,18.5],backgroundColor:'#c9a84c'},
+        {label:items[2],data:[9.6,10.2,9.4,8.2],backgroundColor:'#6b3a2a'},
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}},
+      scales:{x:{stacked:true,ticks:{font:{size:10}}},y:{stacked:true,ticks:{font:{size:10}}}}
+    }
+  });
+}
+function buildPieChart() {
+  const ctx = document.getElementById('c-pie');
+  if (!ctx) return;
+  if (charts.pie) charts.pie.destroy();
+  const items = ITEM_NAMES[lang];
+  const other = lang==='mr'?'इतर':lang==='hi'?'अन्य':'Other';
+  charts.pie = new Chart(ctx,{
+    type:'doughnut',
+    data:{
+      labels:[...items.slice(0,5),other],
+      datasets:[{data:[112,68,41,14,4,7],backgroundColor:['#40916c','#e07b39','#6b3a2a','#c9a84c','#74c69d','#adb5bd']}]
+    },
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}}}
+  });
+}
+
+// ===== PRINT =====
+function renderPrint() {
+  const now = new Date();
+  // Update text labels
+  const map = {
+    'pr-school-name': t('school_name'),
+    'pr-school-info': t('school_info'),
+    'pr-ministry': t('ministry'),
+    'pr-school-det': t('school_details'),
+    'pr-total-enrolled-lbl': t('total_enrolled'),
+    'pr-students-lbl': lang==='mr'?'विद्यार्थी':lang==='hi'?'विद्यार्थी':'Students',
+    'pr-school-type-lbl': t('school_type'),
+    'pr-school-type-val': t('school_type_val'),
+    'pr-hm-lbl': t('headmaster'),
+    'pr-cook-lbl': t('cooks_name'),
+    'pr-mon-sum-lbl': t('monthly_summary_hdr'),
+    'pr-wdays-lbl': t('working_days'),
+    'pr-days-lbl': lang==='mr'?'दिवस':lang==='hi'?'दिवस':'Days',
+    'pr-total-fed-lbl': t('total_fed'),
+    'pr-budget-lbl': t('budget_util2'),
+    'pr-gen-lbl': t('report_gen'),
+    'pr-gen-date': now.toLocaleDateString('en-IN'),
+    'pr-month-label': lang==='mr'?'महिना: फेब्रुवारी 2026':lang==='hi'?'माह: फरवरी 2026':'Month: February 2026',
+    'pr-daily-hdr': t('daily_reg_hdr'),
+    'pr-stock-hdr': t('monthly_stock_hdr'),
+    'pr-date-lbl': t('date_label'),
+    'pr-day-lbl': t('day'),
+    'pr-pres-lbl': t('present'),
+    'pr-meal-lbl': t('meal_type'),
+    'pr-rice-lbl': t('rice'),
+    'pr-wheat-lbl': t('wheat'),
+    'pr-dal-lbl': t('dal'),
+    'pr-oil-lbl': t('oil'),
+    'pr-salt-lbl': t('salt'),
+    'pr-rem-lbl': t('remarks'),
+    'pr-total-lbl': t('total_row'),
+    'pr-s-item': t('item'),
+    'pr-s-open': t('opening_stock'),
+    'pr-s-recv': t('total_received'),
+    'pr-s-used': t('total_used'),
+    'pr-s-wast': t('wastage'),
+    'pr-s-clos': t('closing_stock'),
+    'pr-sig-cook': t('sig_cook'),
+    'pr-sig-teacher': t('sig_teacher'),
+    'pr-sig-hm': t('sig_hm'),
+    'pr-sig-beo': t('sig_beo'),
+    'pr-footer': t('print_footer'),
+  };
+  Object.entries(map).forEach(([id,val])=>{
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  });
+
+  // Daily tbody
+  const tbody = document.getElementById('print-tbody');
+  if (tbody) {
+    tbody.innerHTML = '';
+    const days = lang==='hi'?DAYS_HI:lang==='mr'?DAYS_MR:DAYS_EN;
+    const mealLbl = lang==='mr'?'जेवण':lang==='hi'?'भोजन':'Lunch';
+    DAILY_DATA.forEach((row,i)=>{
+      const isHol=row.p===0;
+      const remText=row.rem==='holiday'?t('holiday'):row.rem==='today_label'?t('today_label'):row.rem==='stock_delivery'?t('stock_delivery'):'';
+      tbody.innerHTML+=`<tr>
+        <td>${DATE_LABELS[i]}</td>
+        <td>${days[i]}</td>
+        <td>${isHol?'—':row.p}</td>
+        <td>${isHol?t('holiday'):mealLbl}</td>
+        <td>${isHol?'—':row.rice}</td>
+        <td>${isHol?'—':row.wheat}</td>
+        <td>${isHol?'—':row.dal}</td>
+        <td>${isHol?'—':row.oil}</td>
+        <td>${isHol?'—':row.salt}</td>
+        <td>${remText}</td>
+      </tr>`;
+    });
+  }
+
+  // Stock tbody
+  const stbody = document.getElementById('print-stock-tbody');
+  if (stbody) {
+    stbody.innerHTML = '';
+    const items = ITEM_NAMES[lang];
+    const units = ITEM_UNITS;
+    STOCK_DATA.forEach((s,i)=>{
+      const bal = +(s.opening+s.received-s.used-s.wastage).toFixed(1);
+      stbody.innerHTML+=`<tr>
+        <td>${items[i]}</td>
+        <td>${s.opening} ${units[i]}</td>
+        <td>${s.received} ${units[i]}</td>
+        <td>${s.used} ${units[i]}</td>
+        <td>${s.wastage} ${units[i]}</td>
+        <td>${bal} ${units[i]}</td>
+      </tr>`;
+    });
+  }
+}
+
+// ===== KEYBOARD =====
+document.addEventListener('keydown',e=>{
+  if (e.key==='Escape') {
+    document.querySelectorAll('.modal-bg.open').forEach(m=>m.classList.remove('open'));
+    toggleSB(false);
+  }
+});
+
+// ===== INIT DATE =====
+document.getElementById('dash-date').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+</script>
+</body>
+</html>
